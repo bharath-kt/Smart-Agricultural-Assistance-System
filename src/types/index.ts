@@ -51,6 +51,8 @@ export interface GovernmentScheme {
 
 // Disease Detection Types
 export interface DiseasePrediction {
+  plantName: string;
+  diseaseName: string;
   disease: string;
   confidence: number;
   description: string;

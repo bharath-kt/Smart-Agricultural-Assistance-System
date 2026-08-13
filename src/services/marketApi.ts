@@ -1,92 +1,96 @@
 import type { CommodityPrice, PriceHistory } from '../types';
 
-// Using mock data since real agricultural APIs often require authentication
-export async function fetchMarketPrices(region?: string): Promise<CommodityPrice[]> {
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 800));
-  
-  const commodities: CommodityPrice[] = [
-    {
-      name: 'Wheat',
-      currentPrice: 2450,
-      previousPrice: 2380,
-      change: 70,
-      changePercent: 2.94,
-      unit: 'per quintal',
-      region: region || 'National Average',
-      history: generatePriceHistory(2450, 2100, 2600)
-    },
-    {
-      name: 'Rice (Basmati)',
-      currentPrice: 3850,
-      previousPrice: 3900,
-      change: -50,
-      changePercent: -1.28,
-      unit: 'per quintal',
-      region: region || 'National Average',
-      history: generatePriceHistory(3850, 3500, 4200)
-    },
-    {
-      name: 'Cotton',
-      currentPrice: 7200,
-      previousPrice: 6950,
-      change: 250,
-      changePercent: 3.60,
-      unit: 'per quintal',
-      region: region || 'National Average',
-      history: generatePriceHistory(7200, 6500, 7800)
-    },
-    {
-      name: 'Sugarcane',
-      currentPrice: 315,
-      previousPrice: 310,
-      change: 5,
-      changePercent: 1.61,
-      unit: 'per quintal',
-      region: region || 'National Average',
-      history: generatePriceHistory(315, 280, 340)
-    },
-    {
-      name: 'Maize',
-      currentPrice: 2100,
-      previousPrice: 2050,
-      change: 50,
-      changePercent: 2.44,
-      unit: 'per quintal',
-      region: region || 'National Average',
-      history: generatePriceHistory(2100, 1800, 2400)
-    },
-    {
-      name: 'Soybean',
-      currentPrice: 4200,
-      previousPrice: 4350,
-      change: -150,
-      changePercent: -3.45,
-      unit: 'per quintal',
-      region: region || 'National Average',
-      history: generatePriceHistory(4200, 3800, 4600)
-    },
-    {
-      name: 'Potato',
-      currentPrice: 1250,
-      previousPrice: 1400,
-      change: -150,
-      changePercent: -10.71,
-      unit: 'per quintal',
-      region: region || 'National Average',
-      history: generatePriceHistory(1250, 1000, 1800)
-    },
-    {
-      name: 'Tomato',
-      currentPrice: 2800,
-      previousPrice: 2200,
-      change: 600,
-      changePercent: 27.27,
-      unit: 'per quintal',
-      region: region || 'National Average',
-      history: generatePriceHistory(2800, 1500, 3500)
+export const SUPPORTED_CROPS = [
+  'Corn', 'Coconut', 'Onion', 'Ginger', 'Tomato', 'Potato', 'Rice',
+  'Wheat', 'Banana', 'Chilli', 'Turmeric', 'Sugarcane', 'Groundnut'
+];
+
+export const CROP_TRANSLATIONS: Record<string, { en: string; kn: string }> = {
+  Corn: { en: 'Corn (Maize)', kn: 'ಮೆಕ್ಕೆಜೋಳ' },
+  Coconut: { en: 'Coconut', kn: 'ತೆಂಗಿನಕಾಯಿ' },
+  Onion: { en: 'Onion', kn: 'ಈರುಳ್ಳಿ' },
+  Ginger: { en: 'Ginger', kn: 'ಶುಂಠಿ' },
+  Tomato: { en: 'Tomato', kn: 'ಟೊಮೆಟೊ' },
+  Potato: { en: 'Potato', kn: 'ಆಲೂಗಡ್ಡೆ' },
+  Rice: { en: 'Rice (Paddy)', kn: 'ಅಕ್ಕಿ / ಭತ್ತ' },
+  Wheat: { en: 'Wheat', kn: 'ಗೋಧಿ' },
+  Banana: { en: 'Banana', kn: 'ಬಾಳೆಹಣ್ಣು' },
+  Chilli: { en: 'Chilli', kn: 'ಮೆಣಸಿನಕಾಯಿ' },
+  Turmeric: { en: 'Turmeric', kn: 'ಅರಿಶಿನ' },
+  Sugarcane: { en: 'Sugarcane', kn: 'ಕಬ್ಬು' },
+  Groundnut: { en: 'Groundnut', kn: 'ಕಡಲೆಕಾಯಿ' }
+};
+
+export const UNIT_TRANSLATIONS: Record<string, { en: string; kn: string }> = {
+  'per quintal': { en: 'per quintal', kn: 'ಪ್ರತಿ ಕ್ವಿಂಟಾಲ್‌ಗೆ' },
+  'per 100 nuts': { en: 'per 100 nuts', kn: 'ಪ್ರತಿ 100 ಕಾಯಿಗಳಿಗೆ' }
+};
+
+export function translateCropName(cropName: string, lang: string): string {
+  if (lang === 'kn' && CROP_TRANSLATIONS[cropName]) {
+    return CROP_TRANSLATIONS[cropName].kn;
+  }
+  return CROP_TRANSLATIONS[cropName]?.en || cropName;
+}
+
+export function translateUnit(unit: string, lang: string): string {
+  if (lang === 'kn' && UNIT_TRANSLATIONS[unit]) {
+    return UNIT_TRANSLATIONS[unit].kn;
+  }
+  return UNIT_TRANSLATIONS[unit]?.en || unit;
+}
+
+// Realistic Indian market prices (per quintal or per unit)
+const CROP_DATA: { [key: string]: { current: number; min: number; max: number; unit: string } } = {
+  Corn: { current: 2100, min: 1850, max: 2400, unit: 'per quintal' },
+  Coconut: { current: 2500, min: 1800, max: 3200, unit: 'per 100 nuts' },
+  Onion: { current: 2200, min: 1200, max: 4000, unit: 'per quintal' },
+  Ginger: { current: 8500, min: 6000, max: 12000, unit: 'per quintal' },
+  Tomato: { current: 2800, min: 1500, max: 4500, unit: 'per quintal' },
+  Potato: { current: 1400, min: 900, max: 2000, unit: 'per quintal' },
+  Rice: { current: 3600, min: 3000, max: 4500, unit: 'per quintal' },
+  Wheat: { current: 2450, min: 2100, max: 2700, unit: 'per quintal' },
+  Banana: { current: 1800, min: 1200, max: 2500, unit: 'per quintal' },
+  Chilli: { current: 12000, min: 8000, max: 18000, unit: 'per quintal' },
+  Turmeric: { current: 9500, min: 7000, max: 13000, unit: 'per quintal' },
+  Sugarcane: { current: 340, min: 290, max: 380, unit: 'per quintal' },
+  Groundnut: { current: 5800, min: 4800, max: 7000, unit: 'per quintal' }
+};
+
+export async function fetchMarketPrices(region?: string, cropName?: string): Promise<CommodityPrice[]> {
+  // Try logging query to backend API if token exists
+  const token = localStorage.getItem('smart_agri_token');
+  const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
+  if (token && cropName) {
+    try {
+      fetch(`${apiBase}/market/prices?crop_name=${encodeURIComponent(cropName)}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      }).catch(() => {});
+    } catch (e) {
+      // ignore
     }
-  ];
+  }
+
+  // Simulate API delay
+  await new Promise(resolve => setTimeout(resolve, 300));
+
+  const commodities: CommodityPrice[] = SUPPORTED_CROPS.map(name => {
+    const data = CROP_DATA[name];
+    const prevPrice = Math.round(data.current * (0.95 + Math.random() * 0.1));
+    const change = data.current - prevPrice;
+    const changePercent = parseFloat(((change / prevPrice) * 100).toFixed(2));
+
+    return {
+      name,
+      currentPrice: data.current,
+      previousPrice: prevPrice,
+      change,
+      changePercent,
+      unit: data.unit,
+      region: region || 'Karnataka, India',
+      history: generatePriceHistory(data.current, data.min, data.max)
+    };
+  });
 
   return commodities;
 }
@@ -114,9 +118,16 @@ function generatePriceHistory(current: number, min: number, max: number): PriceH
   return history;
 }
 
-export function predictPriceTrend(history: PriceHistory[]): { prediction: number; confidence: number } {
+export interface PricePrediction {
+  prediction: number;
+  confidence: number;
+  forecast_7d: number[];
+  trend: 'increase' | 'decrease' | 'stable';
+}
+
+export function predictPriceTrend(history: PriceHistory[]): PricePrediction {
   if (history.length < 7) {
-    return { prediction: 0, confidence: 0 };
+    return { prediction: 0, confidence: 0, forecast_7d: [], trend: 'stable' };
   }
 
   const recent = history.slice(-7);
@@ -126,8 +137,20 @@ export function predictPriceTrend(history: PriceHistory[]): { prediction: number
   }, 0) / 6;
 
   const lastPrice = recent[recent.length - 1].price;
-  const predictedPrice = Math.round(lastPrice + avgChange * 3);
+  const forecast_7d: number[] = [];
+  let currentPrice = lastPrice;
+
+  for (let i = 0; i < 7; i++) {
+    currentPrice = Math.round(currentPrice + avgChange + (Math.random() - 0.5) * Math.abs(avgChange));
+    forecast_7d.push(currentPrice);
+  }
+
+  const predictedPrice = forecast_7d[forecast_7d.length - 1];
   const confidence = Math.min(85, Math.max(40, 100 - Math.abs(avgChange) * 2));
 
-  return { prediction: predictedPrice, confidence };
+  let trend: 'increase' | 'decrease' | 'stable' = 'stable';
+  if (predictedPrice > lastPrice * 1.02) trend = 'increase';
+  else if (predictedPrice < lastPrice * 0.98) trend = 'decrease';
+
+  return { prediction: predictedPrice, confidence, forecast_7d, trend };
 }

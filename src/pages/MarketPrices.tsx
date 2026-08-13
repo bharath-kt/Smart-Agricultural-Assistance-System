@@ -1,15 +1,18 @@
 import { useState, useEffect } from 'react';
-import { TrendingUp, TrendingDown, Search, Filter, ArrowUpRight, ArrowDownRight } from 'lucide-react';
+import { TrendingUp, TrendingDown, Minus, Search, ArrowUpRight, ArrowDownRight, MapPin } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import type { CommodityPrice } from '../types';
-import { fetchMarketPrices, predictPriceTrend } from '../services/marketApi';
+import { fetchMarketPrices, predictPriceTrend, SUPPORTED_CROPS, translateCropName, translateUnit } from '../services/marketApi';
+import { useLanguage } from '../contexts/LanguageContext';
 
 export default function MarketPrices() {
+  const { language, t } = useLanguage();
   const [prices, setPrices] = useState<CommodityPrice[]>([]);
   const [filteredPrices, setFilteredPrices] = useState<CommodityPrice[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCommodity, setSelectedCommodity] = useState<CommodityPrice | null>(null);
+  const [selectedCropFilter, setSelectedCropFilter] = useState<string>('All');
 
   useEffect(() => {
     loadPrices();
@@ -17,7 +20,7 @@ export default function MarketPrices() {
 
   useEffect(() => {
     filterPrices();
-  }, [searchTerm, prices]);
+  }, [searchTerm, prices, selectedCropFilter, language]);
 
   async function loadPrices() {
     setLoading(true);
@@ -36,18 +39,27 @@ export default function MarketPrices() {
   }
 
   function filterPrices() {
-    if (!searchTerm.trim()) {
-      setFilteredPrices(prices);
-      return;
+    let filtered = prices;
+    if (selectedCropFilter !== 'All') {
+      filtered = filtered.filter(p => p.name === selectedCropFilter);
     }
-    const filtered = prices.filter(p => 
-      p.name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    if (searchTerm.trim()) {
+      filtered = filtered.filter(p =>
+        translateCropName(p.name, language).toLowerCase().includes(searchTerm.toLowerCase()) ||
+        p.name.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
     setFilteredPrices(filtered);
   }
 
   function getPrediction(commodity: CommodityPrice) {
     return predictPriceTrend(commodity.history);
+  }
+
+  function getTrendText(trend: 'increase' | 'decrease' | 'stable'): string {
+    if (trend === 'increase') return t('market.trendIncrease');
+    if (trend === 'decrease') return t('market.trendDecrease');
+    return t('market.trendStable');
   }
 
   if (loading) {
@@ -63,24 +75,30 @@ export default function MarketPrices() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Market Price Prediction</h1>
-          <p className="text-gray-500">Track commodity prices and market trends</p>
+          <h1 className="text-2xl font-bold text-gray-900">{t('market.title')}</h1>
+          <p className="text-gray-500">{t('market.subtitle')}</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
+          <select
+            value={selectedCropFilter}
+            onChange={(e) => setSelectedCropFilter(e.target.value)}
+            className="input-field w-44"
+          >
+            <option value="All">{t('market.allCrops')}</option>
+            {SUPPORTED_CROPS.map(crop => (
+              <option key={crop} value={crop}>{translateCropName(crop, language)}</option>
+            ))}
+          </select>
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input
               type="text"
-              placeholder="Search commodities..."
+              placeholder={t('market.searchPlaceholder')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="input-field pl-10 w-48"
             />
           </div>
-          <button className="btn-secondary flex items-center gap-2">
-            <Filter className="w-4 h-4" />
-            <span className="hidden sm:inline">Filter</span>
-          </button>
         </div>
       </div>
 
@@ -89,17 +107,19 @@ export default function MarketPrices() {
         {filteredPrices.map((item) => {
           const prediction = getPrediction(item);
           const isPositive = item.change >= 0;
+          const translatedName = translateCropName(item.name, language);
+          const translatedUnit = translateUnit(item.unit, language);
           
           return (
             <button
               key={item.name}
               onClick={() => setSelectedCommodity(item)}
               className={`card text-left transition-all hover:shadow-lg ${
-                selectedCommodity?.name === item.name ? 'ring-2 ring-primary-500' : ''
+                selectedCommodity?.name === item.name ? 'ring-2 ring-primary-500 bg-primary-50/10' : ''
               }`}
             >
               <div className="flex items-start justify-between mb-2">
-                <h3 className="font-semibold text-gray-900">{item.name}</h3>
+                <h3 className="font-semibold text-gray-900">{translatedName}</h3>
                 {isPositive ? (
                   <TrendingUp className="w-5 h-5 text-green-500" />
                 ) : (
@@ -107,18 +127,30 @@ export default function MarketPrices() {
                 )}
               </div>
               <p className="text-2xl font-bold text-gray-900">₹{item.currentPrice.toLocaleString()}</p>
-              <p className="text-sm text-gray-500">{item.unit}</p>
+              <p className="text-xs text-gray-500">{translatedUnit}</p>
               <div className={`flex items-center gap-1 mt-2 text-sm ${isPositive ? 'text-green-600' : 'text-red-600'}`}>
                 {isPositive ? <ArrowUpRight className="w-4 h-4" /> : <ArrowDownRight className="w-4 h-4" />}
                 <span>{isPositive ? '+' : ''}{item.changePercent.toFixed(2)}%</span>
-                <span className="text-gray-400">from last week</span>
+                <span className="text-gray-400 text-xs">{t('market.fromLastWeek')}</span>
               </div>
               <div className="mt-3 pt-3 border-t border-gray-100">
-                <p className="text-xs text-gray-500">Predicted (3 days)</p>
-                <p className={`font-semibold ${prediction.prediction > item.currentPrice ? 'text-green-600' : 'text-red-600'}`}>
-                  ₹{prediction.prediction.toLocaleString()}
-                  <span className="text-xs text-gray-400 ml-1">({prediction.confidence}% confidence)</span>
-                </p>
+                <p className="text-xs text-gray-500">{t('market.sevenDayTrend')}</p>
+                <div className="flex items-center gap-2">
+                  {prediction.trend === 'increase' ? (
+                    <TrendingUp className="w-4 h-4 text-green-600" />
+                  ) : prediction.trend === 'decrease' ? (
+                    <TrendingDown className="w-4 h-4 text-red-600" />
+                  ) : (
+                    <Minus className="w-4 h-4 text-gray-500" />
+                  )}
+                  <p className={`font-semibold text-sm ${
+                    prediction.trend === 'increase' ? 'text-green-600' :
+                    prediction.trend === 'decrease' ? 'text-red-600' : 'text-gray-600'
+                  }`}>
+                    {getTrendText(prediction.trend)}
+                  </p>
+                  <span className="text-xs text-gray-400">({prediction.confidence}% {t('market.confidence')})</span>
+                </div>
               </div>
             </button>
           );
@@ -128,15 +160,34 @@ export default function MarketPrices() {
       {/* Chart Section */}
       {selectedCommodity && (
         <div className="card">
-          <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center justify-between mb-6 flex-wrap gap-4">
             <div>
-              <h2 className="text-xl font-bold text-gray-900">{selectedCommodity.name} Price Trend</h2>
-              <p className="text-gray-500">Last 30 days price history</p>
+              <h2 className="text-xl font-bold text-gray-900">
+                {translateCropName(selectedCommodity.name, language)} {t('market.priceTrend')}
+              </h2>
+              <div className="flex items-center gap-2 text-gray-500 mt-1 text-sm">
+                <MapPin className="w-4 h-4 text-primary-500" />
+                <span>{selectedCommodity.region}</span>
+                <span className="text-gray-300">|</span>
+                <span>{t('market.last30Days')}</span>
+              </div>
             </div>
-            <div className="flex gap-2">
+            <div className="flex gap-2 flex-wrap">
               <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium">
-                Current: ₹{selectedCommodity.currentPrice.toLocaleString()}
+                {t('market.current')}: ₹{selectedCommodity.currentPrice.toLocaleString()}
               </span>
+              {(() => {
+                const pred = getPrediction(selectedCommodity);
+                return (
+                  <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                    pred.trend === 'increase' ? 'bg-green-100 text-green-700' :
+                    pred.trend === 'decrease' ? 'bg-red-100 text-red-700' :
+                    'bg-gray-100 text-gray-700'
+                  }`}>
+                    {t('market.sevenDay')}: {pred.trend === 'increase' ? '↑' : pred.trend === 'decrease' ? '↓' : '→'} {getTrendText(pred.trend)}
+                  </span>
+                );
+              })()}
             </div>
           </div>
           
@@ -146,7 +197,7 @@ export default function MarketPrices() {
                 <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                 <XAxis 
                   dataKey="date" 
-                  tickFormatter={(date) => new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                  tickFormatter={(date) => new Date(date).toLocaleDateString(language === 'kn' ? 'kn-IN' : 'en-US', { month: 'short', day: 'numeric' })}
                   stroke="#9ca3af"
                 />
                 <YAxis 
@@ -159,8 +210,8 @@ export default function MarketPrices() {
                     border: '1px solid #e5e7eb',
                     borderRadius: '8px'
                   }}
-                  formatter={(value) => [`₹${value}`, 'Price']}
-                  labelFormatter={(date) => new Date(date).toLocaleDateString()}
+                  formatter={(value) => [`₹${value}`, t('market.priceTrend')] }
+                  labelFormatter={(date) => new Date(date).toLocaleDateString(language === 'kn' ? 'kn-IN' : 'en-US')}
                 />
                 <Line 
                   type="monotone" 
@@ -177,19 +228,19 @@ export default function MarketPrices() {
           {/* Market Insights */}
           <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="bg-gray-50 rounded-lg p-4">
-              <p className="text-sm text-gray-500">30-Day High</p>
+              <p className="text-sm text-gray-500">{t('market.high30Day')}</p>
               <p className="text-xl font-bold text-gray-900">
                 ₹{Math.max(...selectedCommodity.history.map(h => h.price)).toLocaleString()}
               </p>
             </div>
             <div className="bg-gray-50 rounded-lg p-4">
-              <p className="text-sm text-gray-500">30-Day Low</p>
+              <p className="text-sm text-gray-500">{t('market.low30Day')}</p>
               <p className="text-xl font-bold text-gray-900">
                 ₹{Math.min(...selectedCommodity.history.map(h => h.price)).toLocaleString()}
               </p>
             </div>
             <div className="bg-gray-50 rounded-lg p-4">
-              <p className="text-sm text-gray-500">Average Price</p>
+              <p className="text-sm text-gray-500">{t('market.avgPrice')}</p>
               <p className="text-xl font-bold text-gray-900">
                 ₹{Math.round(selectedCommodity.history.reduce((sum, h) => sum + h.price, 0) / selectedCommodity.history.length).toLocaleString()}
               </p>
@@ -198,14 +249,40 @@ export default function MarketPrices() {
         </div>
       )}
 
+      {/* 7-Day Forecast */}
+      {selectedCommodity && (
+        <div className="card">
+          <h3 className="font-semibold text-gray-900 mb-4">{t('market.forecastTitle')}</h3>
+          {(() => {
+            const pred = getPrediction(selectedCommodity);
+            return (
+              <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
+                {pred.forecast_7d.map((price, idx) => {
+                  const date = new Date();
+                  date.setDate(date.getDate() + idx + 1);
+                  return (
+                    <div key={idx} className="bg-gray-50 rounded-lg p-3 text-center">
+                      <p className="text-xs text-gray-500 mb-1">
+                        {date.toLocaleDateString(language === 'kn' ? 'kn-IN' : 'en-US', { weekday: 'short', day: 'numeric' })}
+                      </p>
+                      <p className="font-semibold text-gray-900">₹{price.toLocaleString()}</p>
+                    </div>
+                  );
+                })}
+              </div>
+            );
+          })()}
+        </div>
+      )}
+
       {/* Selling Recommendations */}
       <div className="card bg-amber-50 border-amber-200">
-        <h3 className="font-semibold text-amber-900 mb-2">Market Insights</h3>
-        <ul className="space-y-2 text-amber-800">
-          <li>• Wheat prices are trending upward. Good time to sell if you have surplus stock.</li>
-          <li>• Tomato prices have increased significantly due to seasonal demand.</li>
-          <li>• Cotton market showing strong growth. Consider holding for better prices.</li>
-          <li>• Potato prices have declined. Monitor market before selling.</li>
+        <h3 className="font-semibold text-amber-900 mb-2">{t('market.insightsTitle')}</h3>
+        <ul className="space-y-2 text-amber-800 text-sm">
+          <li>{t('market.rec1')}</li>
+          <li>{t('market.rec2')}</li>
+          <li>{t('market.rec3')}</li>
+          <li>{t('market.rec4')}</li>
         </ul>
       </div>
     </div>

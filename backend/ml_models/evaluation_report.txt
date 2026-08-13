@@ -1,0 +1,25 @@
+CORN LEAF DISEASE CLASSIFICATION EVALUATION REPORT (MobileNetV2)
+============================================================
+
+Classes: Blight, Common_Rust, Gray_Leaf_Spot, Healthy
+
+Validation Accuracy: 92.60%
+
+Classification Report:
+                precision    recall  f1-score   support
+
+        Blight     0.9346    0.8772    0.9050       114
+   Common_Rust     0.9844    0.9692    0.9767       130
+Gray_Leaf_Spot     0.7812    0.8621    0.8197        58
+       Healthy     0.9750    1.0000    0.9873       117
+
+      accuracy                         0.9379       419
+     macro avg     0.9188    0.9271    0.9222       419
+  weighted avg     0.9401    0.9379    0.9384       419
+
+
+Confusion Matrix:
+[[100   0  12   2]
+ [  1 126   2   1]
+ [  6   2  50   0]
+ [  0   0   0 117]]

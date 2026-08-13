@@ -1,0 +1,45 @@
+TOMATO LEAF DISEASE CLASSIFICATION EVALUATION REPORT (MobileNetV2)
+======================================================================
+
+Framework: PyTorch (MobileNetV2 Transfer Learning)
+Training Accuracy: 68.62%
+Validation Accuracy: 73.71%
+Macro Precision: 73.70%
+Macro Recall: 76.17%
+Macro F1-Score: 73.87%
+
+Classes:
+Bacterial_spot, Early_blight, Late_blight, Leaf_Mold, Septoria_leaf_spot, Spider_mites Two-spotted_spider_mite, Target_Spot, Tomato_Yellow_Leaf_Curl_Virus, Tomato_mosaic_virus, healthy, powdery_mildew
+
+Classification Report:
+                                      precision    recall  f1-score   support
+
+                      Bacterial_spot     0.7925    0.6940    0.7400       732
+                        Early_blight     0.7150    0.6361    0.6733       643
+                         Late_blight     0.6568    0.6717    0.6642       792
+                           Leaf_Mold     0.8799    0.6441    0.7438       739
+                  Septoria_leaf_spot     0.6800    0.6609    0.6703       746
+Spider_mites Two-spotted_spider_mite     0.6722    0.8345    0.7446       435
+                         Target_Spot     0.5882    0.7659    0.6654       457
+       Tomato_Yellow_Leaf_Curl_Virus     0.8701    0.9418    0.9045       498
+                 Tomato_mosaic_virus     0.8984    0.8630    0.8803       584
+                             healthy     0.8491    0.7267    0.7831       805
+                      powdery_mildew     0.5043    0.9405    0.6565       252
+
+                            accuracy                         0.7371      6683
+                           macro avg     0.7370    0.7617    0.7387      6683
+                        weighted avg     0.7553    0.7371    0.7390      6683
+
+
+Confusion Matrix:
+[[508,  24,  32,  13,  81,   1,   9,   7,   0,   9,  48],
+ [ 15, 409,  69,   9,  70,   7,  29,  17,   4,  10,   4],
+ [ 19,  79, 532,  15,  18,   5,  11,   7,   3,  25,  78],
+ [ 51,  15,  71, 476,  22,  24,   9,  13,  14,  15,  29],
+ [ 28,  29,  55,  11, 493,   5,  40,   6,  11,   8,  60],
+ [  0,   2,  11,   4,   3, 363,  34,   5,   8,   5,   0],
+ [  4,   8,   9,   3,  11,  42, 350,   5,   6,  19,   0],
+ [ 10,   1,   1,   0,   3,   9,   1, 469,   1,   2,   1],
+ [  0,   5,  10,   9,  15,  12,  10,   8, 504,   8,   3],
+ [  2,   0,  16,   0,   6,  72, 102,   2,  10, 585,  10],
+ [  4,   0,   4,   1,   3,   0,   0,   0,   0,   3, 237]]
