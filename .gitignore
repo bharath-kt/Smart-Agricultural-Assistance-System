@@ -1,6 +1,11 @@
 # Frontend
 node_modules/
 dist/
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+frontend/.env.local
+frontend/.env.*.local
 
 # Environment variables
 .env

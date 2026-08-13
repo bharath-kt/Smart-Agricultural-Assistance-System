@@ -1,73 +1,48 @@
-# React + TypeScript + Vite
+# Smart Agricultural Assistance System (AgroPulse)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A comprehensive AI-powered Smart Agricultural Assistance Platform designed to empower farmers with real-time weather insights, market price trends, government scheme recommendations, and crop disease detection.
 
-Currently, two official plugins are available:
+## Project Structure
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```
+Smart-Agricultural-Assistance-System/
+├── frontend/                  # React + TypeScript + Vite Frontend App
+│   ├── src/                   # Source code (Components, Pages, Services, Contexts)
+│   ├── public/                # Static public assets
+│   ├── package.json           # Frontend dependencies & scripts
+│   ├── vite.config.ts         # Vite configuration
+│   └── tailwind.config.js     # Tailwind CSS setup
+├── backend/                   # FastAPI / Python ML Backend
+│   ├── app/                   # Backend routes, database models & API endpoints
+│   ├── ml_models/             # Trained CNN disease classification models
+│   ├── requirements.txt       # Python backend dependencies
+│   └── smart_agri.db          # SQLite database
+├── dataset/                   # Plant disease training datasets
+├── uploads/                   # Temporary upload directory
+└── vercel.json                # Vercel deployment configuration
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Quick Start
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### 1. Frontend Setup
+```bash
+cd frontend
+npm install
+npm run dev
 ```
+The frontend dashboard will run at `http://localhost:5173`.
+
+### 2. Backend Setup
+```bash
+cd backend
+python -m venv .venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+python -m app.main
+```
+The FastAPI backend server will run at `http://localhost:8000`.
+
+## Tech Stack
+- **Frontend**: React 19, TypeScript, Vite, Tailwind CSS, Recharts, Lucide React
+- **Backend**: FastAPI, PyTorch / TensorFlow, SQLite, Uvicorn
+- **APIs**: OpenWeatherMap API, Agmarknet Market Prices
