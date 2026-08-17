@@ -98,7 +98,6 @@ async def root():
 
 
 app.include_router(auth.router, prefix="/api/v1")
-app.include_router(auth.router, prefix="/api/v1/auth")  # Ensures /api/v1/auth/auth/signup also gracefully falls back if misconfigured
 app.include_router(profile.router, prefix="/api/v1")
 app.include_router(history.router, prefix="/api/v1")
 app.include_router(weather.router, prefix="/api/v1")
