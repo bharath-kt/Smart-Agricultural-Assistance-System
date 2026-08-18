@@ -58,7 +58,7 @@ def send_verification_email(self, user_id: int, email: str, token: str):
         msg["From"] = settings.SMTP_USER
         msg["To"] = email
         
-        verification_url = f"http://localhost:8000/api/v1/auth/verify-email?token={token}"
+        verification_url = f"https://smart-agricultural-assistance-system-1.onrender.com/api/v1/auth/verify-email?token={token}"
         
         html = f"""
         <html>
