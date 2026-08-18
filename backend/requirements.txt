@@ -31,6 +31,7 @@ pillow==10.1.0
 pydantic==2.5.2
 pydantic-settings==2.1.0
 python-jose==3.3.0
+passlib[bcrypt]==1.7.4
 
 # Utilities
 python-dotenv==1.0.0
