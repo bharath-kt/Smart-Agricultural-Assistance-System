@@ -327,7 +327,7 @@ export function getSchemesByCategory(category: string): GovernmentScheme[] {
 
 export function searchSchemes(query: string): GovernmentScheme[] {
   const lowerQuery = query.toLowerCase();
-  return governmentSchemes.filter(scheme => 
+  return governmentSchemes.filter(scheme =>
     scheme.title.toLowerCase().includes(lowerQuery) ||
     scheme.description.toLowerCase().includes(lowerQuery) ||
     scheme.category.toLowerCase().includes(lowerQuery)
