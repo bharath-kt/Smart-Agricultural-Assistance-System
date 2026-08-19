@@ -1,15 +1,14 @@
 import type { DiseasePrediction } from '../types';
 
 // Supported crops
-export const SUPPORTED_CROPS = ['Tomato', 'Corn', 'Paddy'];
+export const SUPPORTED_CROPS = ['Tomato', 'Corn'];
 
 export const CROP_LOCALIZATION: Record<string, { en: string; kn: string }> = {
   Tomato: { en: 'Tomato', kn: 'ಟೊಮೆಟೊ (Tomato)' },
-  Corn: { en: 'Corn', kn: 'ಮೆಕ್ಕೆಜೋಳ (Corn)' },
-  Paddy: { en: 'Paddy / Rice', kn: 'ಭತ್ತ (Paddy)' }
+  Corn: { en: 'Corn', kn: 'ಮೆಕ್ಕೆಜೋಳ (Corn)' }
 };
 
-// Plant disease classes (Tomato and Corn 4-class)
+// Plant disease classes
 export const DISEASE_CLASSES = [
   'Corn Blight',
   'Corn Common Rust',
@@ -35,6 +34,7 @@ export const DISEASE_KN_TRANSLATIONS: Record<string, {
   treatment: string[];
   prevention: string[];
 }> = {
+
   'Tomato Early Blight': {
     plantName: 'ಟೊಮೆಟೊ',
     diseaseName: 'ಅರ್ಲಿ ಬ್ಲೈಟ್ (Early Blight)',
@@ -52,6 +52,7 @@ export const DISEASE_KN_TRANSLATIONS: Record<string, {
       'ಮಣ್ಣಿನ ತೇವಾಂಶ ಸಂರಕ್ಷಣೆಗೆ ಹೊದಿಕೆ (Mulch) ಬಳಸಿ'
     ]
   },
+
   'Corn Blight': {
     plantName: 'ಮೆಕ್ಕೆಜೋಳ',
     diseaseName: 'ಬ್ಲೈಟ್ ರೋಗ (Blight)',
@@ -68,6 +69,7 @@ export const DISEASE_KN_TRANSLATIONS: Record<string, {
       'ಸರಿಯಾದ ಅಂತರದಲ್ಲಿ ಬಿತ್ತನೆ ಮಾಡಿ'
     ]
   },
+
   'Corn Common Rust': {
     plantName: 'ಮೆಕ್ಕೆಜೋಳ',
     diseaseName: 'ಸಾಮಾನ್ಯ ತುಕ್ಕು ರೋಗ (Common Rust)',
@@ -83,6 +85,7 @@ export const DISEASE_KN_TRANSLATIONS: Record<string, {
       'ಬೆಳೆ ಪರಿವರ್ತನೆ ಮಾಡಿ'
     ]
   },
+
   'Corn Gray Leaf Spot': {
     plantName: 'ಮೆಕ್ಕೆಜೋಳ',
     diseaseName: 'ಗ್ರೇ ಲೀಫ್ ಸ್ಪಾಟ್ (Gray Leaf Spot)',
@@ -98,18 +101,28 @@ export const DISEASE_KN_TRANSLATIONS: Record<string, {
       'ಸಮತೋಲಿತ ರಸಗೊಬ್ಬರ ನೀಡಿ'
     ]
   },
+
   'Healthy': {
     plantName: 'ಸಸ್ಯ',
     diseaseName: 'ಆರೋಗ್ಯಕರ ಸಸ್ಯ',
     disease: 'ಆರೋಗ್ಯಕರ ಸಸ್ಯ',
     description: 'ಸಸ್ಯವು ಸಂಪೂರ್ಣವಾಗಿ ಆರೋಗ್ಯಕರವಾಗಿದೆ ಮತ್ತು ರೋಗದ ಯಾವುದೇ ಚಿಹ್ನೆಗಳಿಲ್ಲ.',
-    treatment: ['ನಿಯಮಿತ ಆರೈಕೆ ಮತ್ತು ನೀರಾವರಿ ಮುಂದುವರಿಸಿ'],
-    prevention: ['ಸಾಮಾನ್ಯ ಬೆಳೆ ನಿರ್ವಹಣೆ ಮುಂದುವರಿಸಿ']
+    treatment: [
+      'ನಿಯಮಿತ ಆರೈಕೆ ಮತ್ತು ನೀರಾವರಿ ಮುಂದುವರಿಸಿ'
+    ],
+    prevention: [
+      'ಸಾಮಾನ್ಯ ಬೆಳೆ ನಿರ್ವಹಣೆ ಮುಂದುವರಿಸಿ'
+    ]
   }
 };
 
-// Treatment recommendations for Tomato and Corn diseases
-const TREATMENTS: { [key: string]: { treatment: string[]; prevention: string[] } } = {
+const TREATMENTS: {
+  [key: string]: {
+    treatment: string[];
+    prevention: string[];
+  }
+} = {
+
   'Corn Blight': {
     treatment: [
       'Remove and destroy infected leaves and debris',
@@ -122,6 +135,7 @@ const TREATMENTS: { [key: string]: { treatment: string[]; prevention: string[] }
       'Avoid continuous corn planting'
     ]
   },
+
   'Corn Common Rust': {
     treatment: [
       'Apply fungicide with azoxystrobin or propiconazole if severe',
@@ -134,6 +148,7 @@ const TREATMENTS: { [key: string]: { treatment: string[]; prevention: string[] }
       'Crop rotation'
     ]
   },
+
   'Corn Gray Leaf Spot': {
     treatment: [
       'Apply fungicides with azoxystrobin or pyraclostrobin',
@@ -146,6 +161,7 @@ const TREATMENTS: { [key: string]: { treatment: string[]; prevention: string[] }
       'Ensure balanced soil fertilization'
     ]
   },
+
   'Corn Healthy': {
     treatment: [
       'Continue regular plant monitoring and watering',
@@ -157,6 +173,7 @@ const TREATMENTS: { [key: string]: { treatment: string[]; prevention: string[] }
       'Ensure proper spacing'
     ]
   },
+
   'default': {
     treatment: [
       'Isolate infected plants',
@@ -183,10 +200,23 @@ export async function loadDiseaseModel(): Promise<boolean> {
   }
 }
 
-export function translatePrediction(pred: DiseasePrediction, lang: string): DiseasePrediction {
+export function translatePrediction(
+  pred: DiseasePrediction,
+  lang: string
+): DiseasePrediction {
+
   if (lang === 'kn') {
+
     const key = pred.diseaseName || pred.disease;
-    const kn = DISEASE_KN_TRANSLATIONS[key] || (pred.disease.includes('Healthy') ? DISEASE_KN_TRANSLATIONS['Healthy'] : null);
+
+    const kn =
+      DISEASE_KN_TRANSLATIONS[key] ||
+      (
+        pred.disease.includes('Healthy')
+          ? DISEASE_KN_TRANSLATIONS['Healthy']
+          : null
+      );
+
     if (kn) {
       return {
         ...pred,
@@ -195,106 +225,163 @@ export function translatePrediction(pred: DiseasePrediction, lang: string): Dise
         disease: kn.disease,
         description: kn.description,
         treatment: kn.treatment,
-        prevention: kn.prevention,
+        prevention: kn.prevention
       };
     }
   }
+
   return pred;
 }
 
-export async function predictDisease(imageFile: File, cropType?: string, token?: string): Promise<DiseasePrediction> {
-  if (cropType && !SUPPORTED_CROPS.includes(cropType)) {
-    throw new Error(`Unsupported plant '${cropType}'. Upload Tomato or Corn leaf.`);
+export async function predictDisease(
+  imageFile: File,
+  cropType?: string,
+  token?: string
+): Promise<DiseasePrediction> {
+
+  // Crop selection is mandatory
+  if (!cropType) {
+    throw new Error('Please select the crop type.');
+  }
+
+  // Only Tomato and Corn are supported
+  if (!SUPPORTED_CROPS.includes(cropType)) {
+    throw new Error(
+      `Unsupported plant '${cropType}'. Please select Tomato or Corn.`
+    );
   }
 
   const formData = new FormData();
+
   formData.append('image', imageFile);
-  if (cropType) {
-    formData.append('crop_type', cropType);
-  }
+  formData.append('crop_type', cropType);
 
   const headers: Record<string, string> = {};
-  const authToken = token || localStorage.getItem('smart_agri_token');
+
+  const authToken =
+    token || localStorage.getItem('smart_agri_token');
+
   if (authToken) {
     headers['Authorization'] = `Bearer ${authToken}`;
   }
 
-  // 1. Send HTTP request to backend API /api/v1/disease/detect
-  const apiEndpoints = [
-    '/api/v1/disease/detect',
-    'http://localhost:8000/api/v1/disease/detect'
-  ];
+  // Production backend API
+  const endpoint =
+    `${import.meta.env.VITE_API_URL}/disease/detect`;
 
-  for (const endpoint of apiEndpoints) {
-    try {
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers,
-        body: formData
-      });
+  console.log('Disease API:', endpoint);
+  console.log('Selected crop:', cropType);
 
-      if (response.ok) {
-        const data = await response.json();
-        const plantName = data.plant_name || (cropType ? cropType : 'Corn');
-        const diseaseName = data.disease_name || 'Healthy';
-        const isHealthy = diseaseName.toLowerCase().includes('healthy');
+  try {
 
-        const treatmentList: string[] = [];
-        if (data.treatment?.organic) treatmentList.push(`Organic: ${data.treatment.organic}`);
-        if (data.treatment?.chemical) treatmentList.push(`Chemical: ${data.treatment.chemical}`);
-        if (treatmentList.length === 0) {
-          treatmentList.push(isHealthy ? 'Continue regular care and monitoring' : 'Apply appropriate fungicide and practice sanitation');
-        }
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers,
+      body: formData
+    });
 
-        const preventionList: string[] = [];
-        if (data.treatment?.preventive) {
-          preventionList.push(data.treatment.preventive);
-        } else {
-          preventionList.push('Practice crop rotation, maintain field sanitation, and monitor regularly');
-        }
+    const data = await response.json();
 
-        return {
-          plantName,
-          diseaseName,
-          disease: isHealthy ? 'Healthy Plant' : `${plantName} ${diseaseName}`,
-          confidence: Math.round((data.confidence_score || 0.95) * 100),
-          description: isHealthy
-            ? 'The plant appears to be healthy with no signs of disease.'
-            : `Detected ${diseaseName} on ${plantName}. This is a common plant disease that requires attention.`,
-          treatment: treatmentList,
-          prevention: preventionList
-        };
-      }
-    } catch (e) {
-      // Try next endpoint
+    console.log('Disease API response:', data);
+
+    if (!response.ok) {
+      throw new Error(
+        data.detail ||
+        data.message ||
+        'Disease detection failed.'
+      );
     }
+
+    const plantName =
+      data.plant_name || cropType;
+
+    const diseaseName =
+      data.disease_name || 'Unknown';
+
+    const confidence =
+      Math.round(
+        (data.confidence_score || 0) * 100
+      );
+
+    const isHealthy =
+      diseaseName
+        .toLowerCase()
+        .includes('healthy');
+
+    const treatmentList: string[] = [];
+
+    if (data.treatment?.organic) {
+      treatmentList.push(
+        `Organic: ${data.treatment.organic}`
+      );
+    }
+
+    if (data.treatment?.chemical) {
+      treatmentList.push(
+        `Chemical: ${data.treatment.chemical}`
+      );
+    }
+
+    if (treatmentList.length === 0) {
+
+      treatmentList.push(
+        isHealthy
+          ? 'Continue regular care and monitoring'
+          : 'Follow the recommended treatment for the detected disease'
+      );
+    }
+
+    const preventionList: string[] = [];
+
+    if (data.treatment?.preventive) {
+
+      preventionList.push(
+        data.treatment.preventive
+      );
+
+    } else {
+
+      preventionList.push(
+        'Practice crop rotation, maintain field sanitation, and monitor regularly'
+      );
+    }
+
+    return {
+
+      plantName,
+
+      diseaseName,
+
+      disease: isHealthy
+        ? 'Healthy Plant'
+        : `${plantName} ${diseaseName}`,
+
+      confidence,
+
+      description: isHealthy
+        ? `${plantName} appears to be healthy with no signs of disease.`
+        : `Detected ${diseaseName} on ${plantName}.`,
+
+      treatment: treatmentList,
+
+      prevention: preventionList
+    };
+
+  } catch (error) {
+
+    console.error(
+      'Disease detection API error:',
+      error
+    );
+
+    // IMPORTANT:
+    // Do NOT guess the disease from the filename.
+    // Do NOT return Corn Healthy when the API fails.
+
+    throw new Error(
+      'Disease detection service is unavailable. Please try again.'
+    );
   }
-
-  // 2. Fallback matching if backend API server is offline:
-  const fname = imageFile.name.toLowerCase();
-  let matchedDisease = 'Corn Healthy';
-  if (fname.includes('blight')) matchedDisease = 'Corn Blight';
-  else if (fname.includes('rust')) matchedDisease = 'Corn Common Rust';
-  else if (fname.includes('gray') || fname.includes('spot')) matchedDisease = 'Corn Gray Leaf Spot';
-  else if (fname.includes('health')) matchedDisease = 'Corn Healthy';
-
-  const isHealthy = matchedDisease.includes('Healthy');
-  const treatment = TREATMENTS[matchedDisease] || TREATMENTS['default'];
-  const parts = matchedDisease.split(' ');
-  const plantName = parts[0];
-  const diseaseName = isHealthy ? 'Healthy' : parts.slice(1).join(' ');
-
-  return {
-    plantName,
-    diseaseName,
-    disease: isHealthy ? 'Healthy Plant' : matchedDisease,
-    confidence: 95,
-    description: isHealthy
-      ? 'The plant appears to be healthy with no signs of disease.'
-      : `Detected ${diseaseName} on ${plantName}. This is a common plant disease that requires attention.`,
-    treatment: isHealthy ? ['Continue regular care and monitoring'] : treatment.treatment,
-    prevention: treatment.prevention
-  };
 }
 
 export function getSupportedCrops(): string[] {
