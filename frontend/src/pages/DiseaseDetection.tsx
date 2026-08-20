@@ -65,7 +65,7 @@ export default function DiseaseDetection() {
     ) {
       const match = profile.crops_grown.find(
         (crop) =>
-          ['Tomato', 'Corn', 'Paddy'].includes(crop)
+          ['Tomato', 'Corn'].includes(crop)
       );
 
       if (match) {
@@ -197,7 +197,7 @@ export default function DiseaseDetection() {
 
     if (!supportedCrops.includes(selectedCrop)) {
       setError(
-        'Please select a valid crop: Tomato, Corn, or Paddy.'
+        'Unsupported crop. Only Tomato and Corn are supported.'
       );
       return;
     }

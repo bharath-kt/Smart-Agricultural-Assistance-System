@@ -16,7 +16,7 @@ logger = get_logger(__name__)
 class DiseaseDetectionService:
     """Disease detection using PyTorch MobileNetV2 models."""
 
-    SUPPORTED_CROPS = ["Tomato", "Corn", "Paddy"]
+    SUPPORTED_CROPS = ["Tomato", "Corn"]
 
     CORN_CLASSES = [
         "Corn_(maize)___Blight",
@@ -39,12 +39,7 @@ class DiseaseDetectionService:
         "Tomato___powdery_mildew",
     ]
 
-    PADDY_CLASSES = [
-        "Paddy___Bacterial_leaf_blight",
-        "Paddy___Brown_spot",
-        "Paddy___Leaf_smut",
-        "Paddy___healthy",
-    ]
+    DISEASE_CLASSES = CORN_CLASSES + TOMATO_CLASSES
 
     DISEASE_TREATMENTS = {
         "Corn_(maize)___Blight": {
@@ -135,30 +130,6 @@ class DiseaseDetectionService:
             "organic": "Spray with sulfur or potassium bicarbonate, apply neem oil, improve air circulation",
             "chemical": "Apply sulfur-based fungicides or myclobutanil",
             "preventive": "Provide adequate spacing, plant in full sun, avoid high nitrogen fertilizers",
-        },
-
-        "Paddy___Bacterial_leaf_blight": {
-            "organic": "Ensure field drainage, apply balanced fertilizers, avoid excessive nitrogen",
-            "chemical": "Apply copper hydroxide + streptomycin sulfate",
-            "preventive": "Use resistant rice varieties, avoid deep water during tillering",
-        },
-
-        "Paddy___Brown_spot": {
-            "organic": "Improve soil fertility, apply potassium and micronutrients",
-            "chemical": "Apply mancozeb or edifenphos",
-            "preventive": "Use seed treatment, ensure balanced soil nutrition",
-        },
-
-        "Paddy___Leaf_smut": {
-            "organic": "Remove infected plants, maintain clean field borders",
-            "chemical": "Apply copper-based fungicides if severe",
-            "preventive": "Practice crop rotation, balanced fertilization",
-        },
-
-        "Paddy___healthy": {
-            "organic": "Maintain proper water level and organic soil fertility",
-            "chemical": "No chemical treatment required; crop is healthy",
-            "preventive": "Regular field inspection, proper weed management",
         },
 
         "default": {
@@ -361,86 +332,6 @@ class DiseaseDetectionService:
                 )
 
             # =================================================
-            # PADDY MODEL
-            # =================================================
-
-            paddy_paths = [
-                backend_root
-                / "ml_models"
-                / "plant"
-                / "paddy"
-                / "paddy_disease_model.pth",
-            ]
-
-            paddy_path = next(
-                (path for path in paddy_paths if path.exists()),
-                None,
-            )
-
-            if paddy_path:
-
-                logger.info(
-                    f"Loading Paddy model from: {paddy_path}"
-                )
-
-                checkpoint = torch.load(
-                    str(paddy_path),
-                    map_location=self.device,
-                )
-
-                classes = checkpoint.get(
-                    "classes",
-                    [
-                        c.replace("Paddy___", "")
-                        for c in self.PADDY_CLASSES
-                    ],
-                )
-
-                logger.info(
-                    f"Paddy checkpoint classes: {classes}"
-                )
-
-                model_paddy = models.mobilenet_v2()
-
-                in_features = model_paddy.classifier[1].in_features
-
-                model_paddy.classifier = nn.Sequential(
-                    nn.Dropout(0.3),
-                    nn.Linear(in_features, 128),
-                    nn.ReLU(),
-                    nn.Dropout(0.2),
-                    nn.Linear(128, len(classes)),
-                )
-
-                model_paddy.load_state_dict(
-                    checkpoint["model_state_dict"]
-                )
-
-                model_paddy.to(self.device)
-                model_paddy.eval()
-
-                self.models["Paddy"] = model_paddy
-
-                self.classes_map["Paddy"] = self._normalize_classes(
-                    classes,
-                    "Paddy",
-                )
-
-                logger.info(
-                    f"Paddy model loaded successfully: {paddy_path}"
-                )
-
-                logger.info(
-                    f"Paddy normalized classes: "
-                    f"{self.classes_map['Paddy']}"
-                )
-
-            else:
-                logger.warning(
-                    "Paddy disease model not found."
-                )
-
-            # =================================================
             # MODEL STATUS DEBUG
             # =================================================
 
@@ -522,20 +413,6 @@ class DiseaseDetectionService:
                         f"Tomato___{class_name}"
                     )
 
-            elif crop == "Paddy":
-
-                if class_name.startswith(
-                    "Paddy___"
-                ):
-                    normalized.append(
-                        class_name
-                    )
-
-                else:
-                    normalized.append(
-                        f"Paddy___{class_name}"
-                    )
-
         return normalized
 
     # =========================================================
@@ -594,11 +471,7 @@ class DiseaseDetectionService:
                 )
 
                 return {
-                    "error": (
-                        "Crop type is required. "
-                        "Please select Tomato, Corn, or Paddy "
-                        "before uploading the image."
-                    ),
+                    "error": "Please select a crop.",
                     "supported_crops": self.SUPPORTED_CROPS,
                 }
 
@@ -608,8 +481,6 @@ class DiseaseDetectionService:
                 "tomato": "Tomato",
                 "corn": "Corn",
                 "maize": "Corn",
-                "paddy": "Paddy",
-                "rice": "Paddy",
             }
 
             normalized_crop = crop_mapping.get(
@@ -629,10 +500,7 @@ class DiseaseDetectionService:
                 )
 
                 return {
-                    "error": (
-                        f"Unsupported plant '{crop_type}'. "
-                        "Please select Tomato, Corn, or Paddy."
-                    ),
+                    "error": "Unsupported crop. Only Tomato and Corn are supported.",
                     "supported_crops": self.SUPPORTED_CROPS,
                 }
 
@@ -666,10 +534,7 @@ class DiseaseDetectionService:
                 )
 
                 return {
-                    "error": (
-                        f"The {normalized_crop} disease detection "
-                        "model is not available on the server."
-                    ),
+                    "error": f"{normalized_crop} disease model is unavailable.",
                     "crop": normalized_crop,
                 }
 
@@ -865,16 +730,7 @@ class DiseaseDetectionService:
                     disease_name
                 )
 
-            # =================================================
-            # CORN DISPLAY NAME
-            # =================================================
-
-            if plant_name.lower() in [
-                "corn (maize)",
-                "corn",
-            ]:
-
-                plant_name = "Corn (maize)"
+            plant_name = normalized_crop
 
             # =================================================
             # TREATMENT
@@ -998,7 +854,6 @@ class DiseaseDetectionService:
         all_classes = (
             self.CORN_CLASSES
             + self.TOMATO_CLASSES
-            + self.PADDY_CLASSES
         )
 
         if disease_name not in all_classes:

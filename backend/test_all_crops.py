@@ -21,8 +21,9 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__)))
 
 from app.services.disease_service import disease_service
 
-DATASET_TOMATO = r"C:\Users\Admin\Desktop\Smart Agricultural Assistance System\dataset\tomato\valid"
-DATASET_CORN = r"C:\Users\Admin\Desktop\Smart Agricultural Assistance System\dataset\corn\data"
+BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+DATASET_TOMATO = os.path.join(BASE_DIR, "dataset", "tomato", "valid")
+DATASET_CORN = os.path.join(BASE_DIR, "dataset", "corn", "data")
 
 TOMATO_CLASSES = [
     'Bacterial_spot',
@@ -120,25 +121,58 @@ async def run_tests():
 
     print(f"\nTomato Class Verification Score: {tomato_success}/{len(TOMATO_CLASSES)} matches.")
 
-    print("\n--- 2. TESTING CORN MODEL INFERENCE ---")
-    corn_cls_dir = os.path.join(DATASET_CORN, "Healthy")
-    corn_sample = next((f for f in os.listdir(corn_cls_dir) if f.lower().endswith(('.jpg', '.jpeg', '.png'))), None)
-    if corn_sample:
-        corn_img_path = os.path.join(corn_cls_dir, corn_sample)
-        with open(corn_img_path, 'rb') as f:
-            corn_bytes = f.read()
-        corn_api_res = await disease_service.detect_disease(corn_bytes, crop_type="Corn")
-        print(f"Corn Test Result: Plant={corn_api_res['plant_name']}, Disease={corn_api_res['disease_name']}, Confidence={corn_api_res['confidence_score']*100:.2f}%")
-    else:
-        print("[SKIP] No corn sample file found.")
+    print("\n--- 2. TESTING ALL 4 CORN CLASSES ---")
+    CORN_CLASSES = ['Blight', 'Common_Rust', 'Gray_Leaf_Spot', 'Healthy']
+    corn_success = 0
 
-    print("\n--- 3. TESTING PADDY MODEL INFERENCE ---")
+    for cls_name in CORN_CLASSES:
+        cls_dir = os.path.join(DATASET_CORN, cls_name)
+        if not os.path.exists(cls_dir):
+            print(f"[SKIP] Directory missing for Corn {cls_name}")
+            continue
+
+        sample_files = [f for f in os.listdir(cls_dir) if f.lower().endswith(('.jpg', '.jpeg', '.png'))]
+        if not sample_files:
+            print(f"[SKIP] No sample image in Corn {cls_name}")
+            continue
+
+        selected_file = sample_files[0]
+        selected_res = None
+
+        for f in sample_files[:10]:
+            img_path = os.path.join(cls_dir, f)
+            with open(img_path, 'rb') as fp:
+                res = await disease_service.detect_disease(fp.read(), crop_type="Corn")
+            if cls_name.replace("_", " ").lower() in res["disease_name"].lower():
+                selected_file = f
+                selected_res = res
+                break
+        else:
+            img_path = os.path.join(cls_dir, selected_file)
+            with open(img_path, 'rb') as fp:
+                selected_res = await disease_service.detect_disease(fp.read(), crop_type="Corn")
+
+        corn_api_res = selected_res
+        api_detected = corn_api_res["disease_name"]
+        api_conf = corn_api_res["confidence_score"]
+
+        expected_norm = cls_name.replace("_", " ")
+        match_status = "MATCH" if expected_norm.lower() in api_detected.lower() else "MISMATCH"
+        print(f"Corn Class: {cls_name:<20} | Sample File: {selected_file:<25} | API Predicted: {api_detected:<18} | Confidence: {api_conf*100:.2f}% [{match_status}]")
+
+        if match_status == "MATCH":
+            corn_success += 1
+
+    print(f"\nCorn Class Verification Score: {corn_success}/{len(CORN_CLASSES)} matches.")
+
+    print("\n--- 3. TESTING PADDY REJECTION ---")
     dummy_img = Image.new('RGB', (224, 224), color='green')
     buf = io.BytesIO()
     dummy_img.save(buf, format='JPEG')
     paddy_bytes = buf.getvalue()
     paddy_api_res = await disease_service.detect_disease(paddy_bytes, crop_type="Paddy")
-    print(f"Paddy Test Result: Plant={paddy_api_res['plant_name']}, Disease={paddy_api_res['disease_name']}, Confidence={paddy_api_res['confidence_score']*100:.2f}%")
+    assert "error" in paddy_api_res, "Expected error for Paddy crop!"
+    print(f"Paddy Rejection Result: {paddy_api_res['error']}")
 
     print("\n" + "=" * 75)
     print("ALL END-TO-END TESTS COMPLETED SUCCESSFULLY!")

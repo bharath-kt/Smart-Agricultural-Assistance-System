@@ -17,17 +17,24 @@ logger = get_logger(__name__)
 @router.post("/detect", response_model=dict)
 async def detect_disease(
     image: UploadFile = File(..., description="Leaf image for disease detection"),
-    crop_type: Optional[str] = Form(None, description="Type of crop (Tomato, Corn, or Paddy)"),
+    crop_type: Optional[str] = Form(None, description="Type of crop (Tomato or Corn)"),
     latitude: Optional[float] = Form(None, description="Latitude (optional)"),
     longitude: Optional[float] = Form(None, description="Longitude (optional)"),
     current_user: Optional[User] = Depends(get_optional_current_user),
     db: AsyncSession = Depends(get_db)
 ):
-    """Detect plant disease from leaf image. Supports Tomato, Corn, and Paddy."""
-    if crop_type and crop_type not in disease_service.SUPPORTED_CROPS:
+    """Detect plant disease from leaf image. Supports Tomato and Corn."""
+    if not crop_type or not crop_type.strip():
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Unsupported plant '{crop_type}'. Upload Tomato, Corn, or Paddy leaf."
+            detail="Please select a crop."
+        )
+
+    norm_crop = crop_type.strip().title()
+    if crop_type not in disease_service.SUPPORTED_CROPS and norm_crop not in disease_service.SUPPORTED_CROPS:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Unsupported crop. Only Tomato and Corn are supported."
         )
 
     allowed_types = ["image/jpeg", "image/png", "image/jpg"]

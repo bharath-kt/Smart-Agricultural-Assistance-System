@@ -84,11 +84,33 @@ class TestDiseaseEndpoints:
         
         assert response.status_code in [200, 404]
     
+    def test_detect_disease_unsupported_crop(self):
+        """Test detection with Paddy crop (unsupported)."""
+        response = client.post(
+            "/api/v1/disease/detect",
+            files={"image": ("test.jpg", BytesIO(b"fake_image_data"), "image/jpeg")},
+            data={"crop_type": "Paddy"}
+        )
+        assert response.status_code in [400, 404]
+        if response.status_code == 400:
+            assert "Unsupported crop" in response.json()["detail"]
+
+    def test_detect_disease_missing_crop(self):
+        """Test detection without selecting a crop."""
+        response = client.post(
+            "/api/v1/disease/detect",
+            files={"image": ("test.jpg", BytesIO(b"fake_image_data"), "image/jpeg")}
+        )
+        assert response.status_code in [400, 404]
+        if response.status_code == 400:
+            assert "Please select a crop" in response.json()["detail"]
+    
     def test_detect_disease_invalid_file_type(self):
         """Test detection with invalid file type."""
         response = client.post(
             "/api/v1/disease/detect",
-            files={"image": ("test.txt", BytesIO(b"not an image"), "text/plain")}
+            files={"image": ("test.txt", BytesIO(b"not an image"), "text/plain")},
+            data={"crop_type": "Tomato"}
         )
         
         assert response.status_code in [400, 404]
@@ -100,7 +122,8 @@ class TestDiseaseEndpoints:
         
         response = client.post(
             "/api/v1/disease/detect",
-            files={"image": ("large.jpg", large_file, "image/jpeg")}
+            files={"image": ("large.jpg", large_file, "image/jpeg")},
+            data={"crop_type": "Tomato"}
         )
         
         assert response.status_code in [400, 413, 404]
@@ -111,7 +134,8 @@ class TestDiseaseEndpoints:
         
         response = client.post(
             "/api/v1/disease/detect",
-            files={"image": ("test.jpg", BytesIO(b"fake"), "image/jpeg")}
+            files={"image": ("test.jpg", BytesIO(b"fake"), "image/jpeg")},
+            data={"crop_type": "Tomato"}
         )
         
         assert response.status_code in [500, 404]
