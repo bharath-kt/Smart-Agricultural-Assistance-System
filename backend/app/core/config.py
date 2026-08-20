@@ -22,6 +22,11 @@ class Settings(BaseSettings):
     
     # OpenWeatherMap
     OPENWEATHER_API_KEY: Optional[str] = None
+
+    # LLM Provider Keys
+    GEMINI_API_KEY: Optional[str] = None
+    OPENAI_API_KEY: Optional[str] = None
+    GROQ_API_KEY: Optional[str] = None
     
     # Celery
     CELERY_BROKER_URL: str = "redis://localhost:6379/0"

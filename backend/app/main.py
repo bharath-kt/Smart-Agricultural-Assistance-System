@@ -8,7 +8,7 @@ from fastapi.responses import JSONResponse
 from app.core.config import settings
 from app.core.logging import configure_logging, get_logger
 from app.db.base import async_engine, Base
-from app.api.v1.endpoints import weather, market, disease, schemes, auth, profile, history
+from app.api.v1.endpoints import weather, market, disease, schemes, auth, profile, history, chat
 from app.services.scheme_service import scheme_service
 from app.db.base import AsyncSessionLocal
 
@@ -103,6 +103,7 @@ app.include_router(weather.router, prefix="/api/v1")
 app.include_router(market.router, prefix="/api/v1")
 app.include_router(disease.router, prefix="/api/v1")
 app.include_router(schemes.router, prefix="/api/v1")
+app.include_router(chat.router, prefix="/api/v1")
 
 # Direct aliases for top-level /api/v1/signup and /api/v1/register
 @app.post("/api/v1/signup", include_in_schema=False)
