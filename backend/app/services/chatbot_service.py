@@ -14,7 +14,7 @@ from app.services.disease_service import disease_service
 
 logger = get_logger(__name__)
 
-SYSTEM_PROMPT = """You are Smart Agriculture Assistant, an AI agricultural decision-support assistant.
+SYSTEM_PROMPT = """You are AgriMitra AI Assistant, an AI agricultural decision-support assistant.
 
 You help farmers with:
 - Crop cultivation and agronomy best practices
@@ -257,8 +257,8 @@ class ChatbotService:
 
         if intent == "greeting":
             if lang == "kn":
-                return f"ನಮಸ್ಕಾರ {farmer_name}! ನಾನು ನಿಮ್ಮ ಅಗ್ರೋ ಪಲ್ಸ್ ಕೃಷಿ AI ಸಹಾಯಕ. {district} ಪ್ರದೇಶದ ಹವಾಮಾನ, ಮಾರುಕಟ್ಟೆ ಬೆಲೆಗಳು, ಟೊಮೆಟೊ ಮತ್ತು ಮೆಕ್ಕೆಜೋಳ ಬೆಳೆ ರೋಗಗಳು ಅಥವಾ ಸರ್ಕಾರಿ ಯೋಜನೆಗಳ ಕುರಿತು ಹೇಗೆ ಸಹಾಯ ಮಾಡಲಿ?"
-            return f"Hello {farmer_name}! I am your AgroPulse AI Assistant. How can I assist your farming operations in {district}, {state} today?"
+                return f"ನಮಸ್ಕಾರ {farmer_name}! ನಾನು ನಿಮ್ಮ ಅಗ್ರಿಮಿತ್ರ AI ಕೃಷಿ ಸಹಾಯಕ. {district} ಪ್ರದೇಶದ ಹವಾಮಾನ, ಮಾರುಕಟ್ಟೆ ಬೆಲೆಗಳು, ಟೊಮೆಟೊ ಮತ್ತು ಮೆಕ್ಕೆಜೋಳ ಬೆಳೆ ರೋಗಗಳು ಅಥವಾ ಸರ್ಕಾರಿ ಯೋಜನೆಗಳ ಕುರಿತು ಹೇಗೆ ಸಹಾಯ ಮಾಡಲಿ?"
+            return f"Hello {farmer_name}! I am your AgriMitra AI Assistant. How can I assist your farming operations in {district}, {state} today?"
 
         if intent == "weather":
             w = tool_data.get("weather", {})

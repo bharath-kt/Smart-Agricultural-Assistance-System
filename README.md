@@ -1,4 +1,4 @@
-# Smart Agricultural Assistance System (AgroPulse)
+# AgriMitra AI – Smart Agricultural Assistance System
 
 A comprehensive AI-powered Smart Agricultural Assistance Platform designed to empower farmers with real-time weather insights, market price trends, government scheme recommendations, and crop disease detection.
 

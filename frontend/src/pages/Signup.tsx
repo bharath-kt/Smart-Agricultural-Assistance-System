@@ -71,7 +71,7 @@ export default function Signup() {
             <Sprout className="w-8 h-8 text-white" />
           </div>
           <h2 className="text-2xl font-bold text-gray-900">
-            {language === 'kn' ? 'ರೈತರ ನೋಂದಣಿ (Sign Up)' : 'Farmer Registration'}
+            {language === 'kn' ? 'ಅಗ್ರಿಮಿತ್ರ AI – ರೈತರ ನೋಂದಣಿ' : 'AgriMitra AI – Farmer Registration'}
           </h2>
           <p className="text-sm text-gray-500">
             {language === 'kn'

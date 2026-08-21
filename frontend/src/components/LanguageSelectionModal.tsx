@@ -25,10 +25,10 @@ export const LanguageSelectionModal: React.FC<LanguageSelectionModalProps> = ({ 
           <div className="w-16 h-16 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center mx-auto mb-4 border border-white/30 shadow-inner">
             <Sprout className="w-9 h-9 text-white" />
           </div>
-          <h1 className="text-3xl font-extrabold tracking-tight">AgroPulse</h1>
-          <p className="text-primary-100 mt-1 font-medium text-base">Smart Farming Assistance System</p>
+          <h1 className="text-3xl font-extrabold tracking-tight">AgriMitra AI</h1>
+          <p className="text-primary-100 mt-1 font-medium text-base">Smart Agricultural Assistance System</p>
           <p className="text-white/90 text-sm mt-3 font-semibold bg-white/10 inline-block px-4 py-1.5 rounded-full border border-white/20">
-            ಅಗ್ರೋ ಪಲ್ಸ್ ಸ್ಮಾರ್ಟ್ ಕೃಷಿ ಸಹಾಯ ವ್ಯವಸ್ಥೆ
+            ಅಗ್ರಿಮಿತ್ರ AI – ಸ್ಮಾರ್ಟ್ ಕೃಷಿ ಸಹಾಯ ವ್ಯವಸ್ಥೆ
           </p>
         </div>
 

@@ -8,8 +8,8 @@ export const translations: Record<Language, Record<string, any>> = {
   en: {
     // App & Layout
     app: {
-      title: 'AgroPulse',
-      subtitle: 'Smart Farming Assistant',
+      title: 'AgriMitra AI',
+      subtitle: 'Smart Agricultural Assistance System',
       nav: {
         dashboard: 'Dashboard',
         weather: 'Weather',
@@ -24,7 +24,7 @@ export const translations: Record<Language, Record<string, any>> = {
 
     // Language Selection Screen (First Launch)
     languageSelection: {
-      welcome: 'Welcome to AgroPulse',
+      welcome: 'Welcome to AgriMitra AI',
       subtitle: 'Please select your preferred language to continue',
       selectPrompt: 'Choose Language / ಭಾಷೆಯನ್ನು ಆಯ್ಕೆಮಾಡಿ',
       englishTitle: 'English',
@@ -36,8 +36,8 @@ export const translations: Record<Language, Record<string, any>> = {
 
     // Dashboard Page
     dashboard: {
-      welcomeTitle: 'Welcome to AgroPulse',
-      welcomeSubtitle: 'Your intelligent farming assistant for weather, market prices, government schemes, and crop health.',
+      welcomeTitle: 'Welcome to AgriMitra AI',
+      welcomeSubtitle: 'Smart Agricultural Assistance System for Real-Time Farming Decision Support.',
       quickStats: {
         temperature: 'Temperature',
         humidity: 'Humidity',
@@ -181,10 +181,10 @@ export const translations: Record<Language, Record<string, any>> = {
 
     // Chatbot UI
     chat: {
-      botName: 'AgroPulse AI Assistant',
+      botName: 'AgriMitra AI Assistant',
       botStatus: 'Online • Smart Farming Helper',
       placeholder: 'Ask a question (e.g. market price, weather, disease, schemes)...',
-      welcomeMsg: 'Hello! I am your AgroPulse Assistant. Ask me anything about crop diseases, market prices, weather conditions, or government schemes!',
+      welcomeMsg: 'Hello! I am your AgriMitra AI Assistant. Ask me anything about crop diseases, market prices, weather conditions, or government schemes!',
       quickQueries: {
         weather: 'How is the weather?',
         market: 'Latest crop prices',
@@ -193,15 +193,15 @@ export const translations: Record<Language, Record<string, any>> = {
       },
       sendBtn: 'Send',
       closeBtn: 'Close Chat',
-      openBtn: 'Ask Farming Assistant',
+      openBtn: 'AgriMitra AI Assistant',
     },
   },
 
   kn: {
     // App & Layout
     app: {
-      title: 'ಅಗ್ರೋ ಪಲ್ಸ್ (AgroPulse)',
-      subtitle: 'ಸ್ಮಾರ್ಟ್ ಕೃಷಿ ಸಹಾಯಕ',
+      title: 'ಅಗ್ರಿಮಿತ್ರ AI (AgriMitra AI)',
+      subtitle: 'ಸ್ಮಾರ್ಟ್ ಕೃಷಿ ಸಹಾಯ ವ್ಯವಸ್ಥೆ',
       nav: {
         dashboard: 'ಮುಖಪುಟ (Dashboard)',
         weather: 'ಹವಾಮಾನ (Weather)',
@@ -216,7 +216,7 @@ export const translations: Record<Language, Record<string, any>> = {
 
     // Language Selection Screen (First Launch)
     languageSelection: {
-      welcome: 'ಅಗ್ರೋ ಪಲ್ಸ್‌ಗೆ ಸುಸ್ವಾಗತ',
+      welcome: 'ಅಗ್ರಿಮಿತ್ರ AI ಗೆ ಸುಸ್ವಾಗತ',
       subtitle: 'ಮುಂದುವರಿಯಲು ದಯವಿಟ್ಟು ನಿಮ್ಮ ಆದ್ಯತೆಯ ಭಾಷೆಯನ್ನು ಆಯ್ಕೆಮಾಡಿ',
       selectPrompt: 'ಭಾಷೆಯನ್ನು ಆಯ್ಕೆಮಾಡಿ / Choose Language',
       englishTitle: 'English',
@@ -228,8 +228,8 @@ export const translations: Record<Language, Record<string, any>> = {
 
     // Dashboard Page
     dashboard: {
-      welcomeTitle: 'ಅಗ್ರೋ ಪಲ್ಸ್‌ಗೆ ಸುಸ್ವಾಗತ',
-      welcomeSubtitle: 'ಹವಾಮಾನ, ಮಾರುಕಟ್ಟೆ ಬೆಲೆಗಳು, ಸರ್ಕಾರಿ ಯೋಜನೆಗಳು ಮತ್ತು ಬೆಳೆ ಆರೋಗ್ಯಕ್ಕಾಗಿ ನಿಮ್ಮ ಬುದ್ಧಿವಂತ ಕೃಷಿ ಸಹಾಯಕ.',
+      welcomeTitle: 'ಅಗ್ರಿಮಿತ್ರ AI ಗೆ ಸುಸ್ವಾಗತ',
+      welcomeSubtitle: 'ನೈಜ-ಸಮಯದ ಕೃಷಿ ನಿರ್ಧಾರಗಳ ಬೆಂಬಲಕ್ಕಾಗಿ ಸ್ಮಾರ್ಟ್ ಕೃಷಿ ಸಹಾಯ ವ್ಯವಸ್ಥೆ.',
       quickStats: {
         temperature: 'ತಾಪಮಾನ',
         humidity: 'ಆರ್ದ್ರತೆ',
@@ -373,10 +373,10 @@ export const translations: Record<Language, Record<string, any>> = {
 
     // Chatbot UI
     chat: {
-      botName: 'ಅಗ್ರೋ ಪಲ್ಸ್ AI ಸಹಾಯಕ',
+      botName: 'ಅಗ್ರಿಮಿತ್ರ AI ಸಹಾಯಕ',
       botStatus: 'ಆನ್‌ಲೈನ್ • ಸ್ಮಾರ್ಟ್ ಕೃಷಿ ಸಹಾಯಕ',
       placeholder: 'ಪ್ರಶ್ನೆ ಕೇಳಿ (ಉದಾ: ಮಾರುಕಟ್ಟೆ ಬೆಲೆ, ಹವಾಮಾನ, ರೋಗ, ಯೋಜನೆಗಳು)...',
-      welcomeMsg: 'ನಮಸ್ಕಾರ! ನಾನು ನಿಮ್ಮ ಅಗ್ರೋ ಪಲ್ಸ್ ಕೃಷಿ ಸಹಾಯಕ. ಬೆಳೆ ರೋಗಗಳು, ಮಾರುಕಟ್ಟೆ ಬೆಲೆಗಳು, ಹವಾಮಾನ ಅಥವಾ ಸರ್ಕಾರಿ ಯೋಜನೆಗಳ ಬಗ್ಗೆ ನನಗೆ ಯಾವುದೇ ಪ್ರಶ್ನೆ ಕೇಳಿ!',
+      welcomeMsg: 'ನಮಸ್ಕಾರ! ನಾನು ನಿಮ್ಮ ಅಗ್ರಿಮಿತ್ರ AI ಕೃಷಿ ಸಹಾಯಕ. ಬೆಳೆ ರೋಗಗಳು, ಮಾರುಕಟ್ಟೆ ಬೆಲೆಗಳು, ಹವಾಮಾನ ಅಥವಾ ಸರ್ಕಾರಿ ಯೋಜನೆಗಳ ಬಗ್ಗೆ ನನಗೆ ಯಾವುದೇ ಪ್ರಶ್ನೆ ಕೇಳಿ!',
       quickQueries: {
         weather: 'ಇಂದಿನ ಹವಾಮಾನ ಹೇಗಿದೆ?',
         market: 'ಇತ್ತೀಚಿನ ಬೆಳೆ ಬೆಲೆಗಳು',
@@ -385,7 +385,7 @@ export const translations: Record<Language, Record<string, any>> = {
       },
       sendBtn: 'ಕಳುಹಿಸಿ',
       closeBtn: 'ಚಾಟ್ ಮುಚ್ಚಿ',
-      openBtn: 'ಕೃಷಿ ಸಹಾಯಕರನ್ನು ಕೇಳಿ',
+      openBtn: 'ಅಗ್ರಿಮಿತ್ರ AI ಸಹಾಯಕರನ್ನು ಕೇಳಿ',
     },
   },
 };

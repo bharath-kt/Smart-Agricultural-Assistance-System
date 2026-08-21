@@ -36,7 +36,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title=settings.APP_NAME,
-    description="Production-ready backend for Smart Agriculture Platform",
+    description="Production-ready backend for AgriMitra AI - Smart Agricultural Assistance System",
     version="1.0.0",
     docs_url="/docs",
     redoc_url="/redoc",
@@ -92,7 +92,7 @@ async def health_check():
 async def root():
     """Root endpoint."""
     return {
-        "message": "Welcome to Smart Agriculture API",
+        "message": "Welcome to AgriMitra AI API",
         "docs": "/docs",
         "version": "1.0.0"
     }

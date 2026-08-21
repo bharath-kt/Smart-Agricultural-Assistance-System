@@ -10,7 +10,7 @@ class Settings(BaseSettings):
     model_config = ConfigDict(env_file=".env", case_sensitive=True, extra="ignore")
     
     # App
-    APP_NAME: str = "Smart Agriculture API"
+    APP_NAME: str = "AgriMitra AI API"
     DEBUG: bool = False
     ENVIRONMENT: str = "production"
     

@@ -43,7 +43,7 @@ export default function Login() {
             <Sprout className="w-8 h-8 text-white" />
           </div>
           <h2 className="text-2xl font-bold text-gray-900">
-            {language === 'kn' ? 'ರೈತರ ಲಾಗಿನ್' : 'Farmer Login'}
+            {language === 'kn' ? 'ಅಗ್ರಿಮಿತ್ರ AI – ರೈತರ ಲಾಗಿನ್' : 'Welcome to AgriMitra AI'}
           </h2>
           <p className="text-sm text-gray-500">
             {language === 'kn'

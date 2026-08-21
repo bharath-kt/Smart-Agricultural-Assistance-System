@@ -134,7 +134,7 @@ export default function Dashboard() {
             <div className="flex items-center gap-2">
               <span className="bg-white/20 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider flex items-center gap-1.5">
                 <Sparkles className="w-3.5 h-3.5 text-yellow-300" />
-                {isAuthenticated ? 'Authenticated Farmer Profile' : 'Smart Agriculture Assistant'}
+                {isAuthenticated ? 'Authenticated Farmer Profile' : 'AgriMitra AI Assistant'}
               </span>
             </div>
             <h1 className="text-2xl lg:text-4xl font-bold">

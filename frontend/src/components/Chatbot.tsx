@@ -45,8 +45,8 @@ export const Chatbot: React.FC = () => {
       const welcomeText =
         isAuthenticated && profile?.full_name
           ? language === 'kn'
-            ? `ನಮಸ್ಕಾರ ${profile.full_name}! ನಾನು ನಿಮ್ಮ ಅಗ್ರೋ ಪಲ್ಸ್ AI ಸಹಾಯಕ. ${profile.district || 'ಮೈಸೂರು'} ಪ್ರದೇಶದ ಹವಾಮಾನ, ಮಾರುಕಟ್ಟೆ ಬೆಲೆಗಳು, ಬೆಳೆ ಸಲಹೆ ಅಥವಾ ಸರ್ಕಾರಿ ಯೋಜನೆಗಳ ಕುರಿತು ಸಹಾಯ ಮಾಡಲು ಸಿದ್ಧನಿದ್ದೇನೆ.`
-            : `Hello ${profile.full_name}! I am your AgroPulse AI Assistant. How can I assist your farming in ${profile.district || 'Mysuru'} today?`
+            ? `ನಮಸ್ಕಾರ ${profile.full_name}! ನಾನು ನಿಮ್ಮ ಅಗ್ರಿಮಿತ್ರ AI ಸಹಾಯಕ. ${profile.district || 'ಮೈಸೂರು'} ಪ್ರದೇಶದ ಹವಾಮಾನ, ಮಾರುಕಟ್ಟೆ ಬೆಲೆಗಳು, ಬೆಳೆ ಸಲಹೆ ಅಥವಾ ಸರ್ಕಾರಿ ಯೋಜನೆಗಳ ಕುರಿತು ಸಹಾಯ ಮಾಡಲು ಸಿದ್ಧನಿದ್ದೇನೆ.`
+            : `Hello ${profile.full_name}! I am your AgriMitra AI Assistant. How can I assist your farming in ${profile.district || 'Mysuru'} today?`
           : t('chat.welcomeMsg') ||
             (language === 'kn'
               ? 'ನಮಸ್ಕಾರ! ನಾನು ನಿಮ್ಮ ಕೃಷಿ AI ಸಹಾಯಕ. ಹವಾಮಾನ, ಬೆಳೆ ಬೆಲೆಗಳು, ಸಸ್ಯ ರೋಗಗಳು ಅಥವಾ ಸರ್ಕಾರಿ ಯೋಜನೆಗಳ ಕುರಿತು ಕೇಳಿ.'
@@ -195,7 +195,7 @@ export const Chatbot: React.FC = () => {
               </div>
               <div>
                 <h3 className="font-bold text-sm leading-tight flex items-center gap-1.5">
-                  <span>{t('chat.botName') || 'AgroPulse AI'}</span>
+                  <span>{t('chat.botName') || 'AgriMitra AI Assistant'}</span>
                   <Sparkles className="w-3.5 h-3.5 text-yellow-300" />
                 </h3>
                 <p className="text-[10px] text-primary-100 font-medium">

@@ -1,4 +1,4 @@
-# Smart Agriculture Platform - Backend
+# AgriMitra AI Backend – Smart Agricultural Assistance System
 
 A production-ready FastAPI backend for a smart agriculture platform providing weather monitoring, market price prediction, plant disease detection, and government scheme information.
 
