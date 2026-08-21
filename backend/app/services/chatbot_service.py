@@ -17,22 +17,21 @@ logger = get_logger(__name__)
 SYSTEM_PROMPT = """You are Smart Agriculture Assistant, an AI agricultural decision-support assistant.
 
 You help farmers with:
-- crop cultivation
-- plant diseases (Tomato and Corn supported)
-- disease prevention and treatment
-- irrigation and fertilizers
-- weather interpretation
-- market prices
-- government schemes
-- crop management
+- Crop cultivation and agronomy best practices
+- Plant diseases and management (Tomato and Corn supported)
+- Disease prevention and organic/chemical treatments
+- Fertilizer dosage, soil health, and irrigation schedules
+- Weather interpretation and advisory
+- Mandi market prices and trends
+- Government schemes (PM-KISAN, PMFBY, KCC, state subsidies)
 
-Guidelines:
-- Give practical, simple, and understandable answers.
-- Never invent real-time information. When real-time data (weather, prices, schemes) is provided in tool context, use it accurately.
-- Clearly distinguish facts from recommendations.
-- Never claim that a text conversation is a confirmed image disease diagnosis. If user requests image diagnosis, guide them to the Disease Detection module.
-- Be careful with pesticide/fungicide recommendations. Avoid unsafe chemical dosages and recommend following product labels and local agricultural authority advice.
-- Support English and Kannada naturally."""
+Multilingual & Dialect Guidelines:
+- Respond in the language used by the farmer (English, Kannada, or Kanglish / Kannada-English code-switched text such as "Tomato ge yava fertilizer use madbeku?", "Male barutta ide, irrigation madbekaa?", "Tomato leaf yellow agide en madbeku?").
+- If the user asks in Kanglish, reply in clear, friendly Kannada or English matching the user's tone.
+- Keep answers practical, clear, concise, and easy for farmers to follow.
+- Never invent real-time weather, mandi prices, or government scheme eligibility. Always utilize provided live service context accurately. If data is unavailable, state so clearly.
+- If the user asks for image-based disease diagnosis or uploads a photo, explicitly advise them to use the Disease Detection module rather than attempting text-only image diagnosis.
+- Avoid dangerous chemical advice. Always suggest following product label instructions and local agricultural extension guidance."""
 
 
 class ChatbotService:
@@ -54,10 +53,10 @@ class ChatbotService:
             if len(msg_lower.split()) <= 4:
                 return "greeting"
 
-        if any(w in combined for w in ["weather", "rain", "temperature", "forecast", "humidity", "ಹವಾಮಾನ", "ಮಳೆ", "ಉಷ್ಣಾಂಶ"]):
+        if any(w in combined for w in ["weather", "rain", "temperature", "forecast", "humidity", "ಹವಾಮಾನ", "ಮಳೆ", "ಉಷ್ಣಾಂಶ", "male", "malai"]):
             return "weather"
 
-        if any(w in combined for w in ["market", "price", "rate", "mandi", "ಬೆಲೆ", "ಮಾರುಕಟ್ಟೆ"]):
+        if any(w in combined for w in ["market", "price", "rate", "mandi", "ಬೆಲೆ", "ಮಾರುಕಟ್ಟೆ", "bele"]):
             if "predict" in msg_lower or "forecast" in msg_lower or "ಮುನ್ಸೂಚನೆ" in msg_lower:
                 return "market_prediction"
             return "market_price"
@@ -65,20 +64,20 @@ class ChatbotService:
         if any(w in combined for w in ["scheme", "schemes", "subsidy", "subsidies", "loan", "loans", "pm-kisan", "pmfby", "kcc", "ಯೋಜನೆ", "ಸಹಾಯಧನ", "ಸರ್ಕಾರ"]):
             return "government_scheme"
 
-        if any(w in combined for w in ["disease", "blight", "rust", "spot", "mold", "virus", "symptom", "ರೋಗ", "ಎಲೆ", "ಕಪ್ಪು ಕಲೆ"]):
-            if any(w in msg_lower for w in ["treat", "control", "cure", "spray", "ಔಷಧಿ", "ನಿಯಂತ್ರಿಸಿ", "ಚಿಕಿತ್ಸೆ"]):
+        if any(w in combined for w in ["disease", "blight", "rust", "spot", "mold", "virus", "symptom", "ರೋಗ", "ಎಲೆ", "ಕಪ್ಪು ಕಲೆ", "roga", "ele"]):
+            if any(w in msg_lower for w in ["treat", "control", "cure", "spray", "ಔಷಧಿ", "ನಿಯಂತ್ರಿಸಿ", "ಚಿಕಿತ್ಸೆ", "madbeku", "madaku"]):
                 return "disease_treatment"
             if any(w in msg_lower for w in ["prevent", "avoid", "prevention", "ತಡೆಯಲು", "ಮುನ್ನೆಚ್ಚರಿಕೆ"]):
                 return "disease_prevention"
             return "disease_information"
 
-        if any(w in combined for w in ["fertilizer", "manure", "npk", "urea", "ಗೊಬ್ಬರ", "ರಸಗೊಬ್ಬರ"]):
+        if any(w in combined for w in ["fertilizer", "manure", "npk", "urea", "ಗೊಬ್ಬರ", "ರಸಗೊಬ್ಬರ", "gobbara"]):
             return "fertilizer"
 
         if any(w in combined for w in ["irrigate", "irrigation", "water", "niru", "ನೀರಾವರಿ", "ನೀರು"]):
             return "irrigation"
 
-        if any(w in combined for w in ["pest", "insect", "mite", "worm", "ಕೀಟ", "ಹುಳು"]):
+        if any(w in combined for w in ["pest", "insect", "mite", "worm", "ಕೀಟ", "ಹುಳು", "hula"]):
             return "pest_management"
 
         if any(w in msg_lower for w in ["help", "support", "what can you do", "ಸಹಾಯ"]):
@@ -89,9 +88,9 @@ class ChatbotService:
     def _extract_crop(self, message: str, history: List[Dict[str, str]], user_profile: Optional[User] = None) -> Optional[str]:
         """Extract crop from message, context history, or user profile."""
         msg_lower = message.lower()
-        if "corn" in msg_lower or "maize" in msg_lower or "ಮೆಕ್ಕೆಜೋಳ" in msg_lower:
+        if "corn" in msg_lower or "maize" in msg_lower or "ಮೆಕ್ಕೆಜೋಳ" in msg_lower or "jolada" in msg_lower:
             return "Corn"
-        if "tomato" in msg_lower or "ಟೊಮೆಟೊ" in msg_lower:
+        if "tomato" in msg_lower or "ಟೊಮೆಟೊ" in msg_lower or "tomatto" in msg_lower:
             return "Tomato"
 
         # Check context history
@@ -115,6 +114,10 @@ class ChatbotService:
         """Detect language (Kannada vs English)."""
         # Kannada Unicode block range: \u0C80-\u0CFF
         if re.search(r"[\u0C80-\u0CFF]", message):
+            return "kn"
+        # Check common Kanglish indicators
+        msg_lower = message.lower()
+        if any(w in msg_lower for w in ["madbeku", "barutta", "ide", "en", "yava", "niru", "bele", "namaste", "madi"]):
             return "kn"
         if requested_lang == "kn":
             return "kn"
@@ -185,8 +188,36 @@ class ChatbotService:
     async def _call_llm_api(
         self, message: str, intent: str, lang: str, history: List[Dict[str, str]], tool_data: Dict[str, Any]
     ) -> Optional[str]:
-        """Call external LLM API (Gemini or OpenAI) with system prompt and tool context."""
-        # Try Gemini API if key exists
+        """Call external LLM API (OpenAI primary, Gemini secondary) with system prompt and tool context."""
+        # Primary: Try OpenAI API if key exists
+        openai_key = self.openai_key or os.getenv("OPENAI_API_KEY")
+        if openai_key:
+            try:
+                import openai
+                client = openai.AsyncOpenAI(api_key=openai_key)
+                model_name = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
+
+                messages_payload = [{"role": "system", "content": SYSTEM_PROMPT}]
+                for h in history[-6:]:
+                    role = "user" if h.get("sender") == "user" else "assistant"
+                    messages_payload.append({"role": role, "content": h.get("text", "")})
+
+                tool_str = f"Live Service Context: {tool_data}" if tool_data else "No live context"
+                user_content = f"Language: {lang}\nIntent: {intent}\n{tool_str}\nQuestion: {message}"
+                messages_payload.append({"role": "user", "content": user_content})
+
+                res = await client.chat.completions.create(
+                    model=model_name,
+                    messages=messages_payload,
+                    max_tokens=600,
+                    temperature=0.7,
+                )
+                if res.choices and res.choices[0].message.content:
+                    return res.choices[0].message.content.strip()
+            except Exception as e:
+                logger.warning(f"OpenAI API call failed: {e}")
+
+        # Secondary: Try Gemini API if key exists
         gemini_key = self.gemini_key or os.getenv("GEMINI_API_KEY")
         if gemini_key:
             try:
@@ -213,34 +244,8 @@ class ChatbotService:
             except Exception as e:
                 logger.warning(f"Gemini API call failed: {e}")
 
-        # Try OpenAI API if key exists
-        openai_key = self.openai_key or os.getenv("OPENAI_API_KEY")
-        if openai_key:
-            try:
-                import openai
-                client = openai.AsyncOpenAI(api_key=openai_key)
-
-                messages_payload = [{"role": "system", "content": SYSTEM_PROMPT}]
-                for h in history[-6:]:
-                    role = "user" if h.get("sender") == "user" else "assistant"
-                    messages_payload.append({"role": role, "content": h.get("text", "")})
-
-                tool_str = f"Live Service Context: {tool_data}" if tool_data else ""
-                user_content = f"Language: {lang}\nIntent: {intent}\n{tool_str}\nQuestion: {message}"
-                messages_payload.append({"role": "user", "content": user_content})
-
-                res = await client.chat.completions.create(
-                    model="gpt-4o-mini",
-                    messages=messages_payload,
-                    max_tokens=500,
-                    temperature=0.7,
-                )
-                if res.choices and res.choices[0].message.content:
-                    return res.choices[0].message.content.strip()
-            except Exception as e:
-                logger.warning(f"OpenAI API call failed: {e}")
-
         return None
+
 
     def _synthesize_fallback_response(
         self, message: str, intent: str, crop: Optional[str], lang: str, tool_data: Dict[str, Any], user_profile: Optional[User]

@@ -23,38 +23,63 @@ export interface AuthResponse {
   full_name?: string;
 }
 
+function parseFetchError(err: unknown, fallbackMessage: string): Error {
+  if (err instanceof TypeError && (err.message.includes('Failed to fetch') || err.message.includes('NetworkError'))) {
+    return new Error('Unable to connect to the agricultural server. Please check your internet connection or server status.');
+  }
+  if (err instanceof Error) {
+    return err;
+  }
+  return new Error(fallbackMessage);
+}
+
 export const authApi = {
   async signup(data: SignupPayload): Promise<AuthResponse> {
-    const res = await fetch(`${API_BASE_URL}/auth/signup`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
-    });
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({ detail: 'Registration failed' }));
-      throw new Error(err.detail || 'Registration failed');
+    try {
+      const res = await fetch(`${API_BASE_URL}/auth/signup`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({ detail: 'Registration failed' }));
+        const message = typeof errData.detail === 'string' ? errData.detail : 'Registration failed. Please check your details.';
+        throw new Error(message);
+      }
+      return await res.json();
+    } catch (err: unknown) {
+      throw parseFetchError(err, 'Registration failed. Please try again.');
     }
-    return res.json();
   },
 
   async login(data: LoginPayload): Promise<AuthResponse> {
-    const res = await fetch(`${API_BASE_URL}/auth/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
-    });
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({ detail: 'Login failed' }));
-      throw new Error(err.detail || 'Invalid email/mobile or password');
+    try {
+      const res = await fetch(`${API_BASE_URL}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({ detail: 'Invalid email/mobile or password' }));
+        const message = typeof errData.detail === 'string' ? errData.detail : 'Invalid credentials. Please try again.';
+        throw new Error(message);
+      }
+      return await res.json();
+    } catch (err: unknown) {
+      throw parseFetchError(err, 'Login failed. Please check your credentials and internet connection.');
     }
-    return res.json();
   },
 
   async getMe(token: string) {
-    const res = await fetch(`${API_BASE_URL}/auth/me`, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    if (!res.ok) throw new Error('Unauthorized');
-    return res.json();
+    try {
+      const res = await fetch(`${API_BASE_URL}/auth/me`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (!res.ok) throw new Error('Session expired or unauthorized.');
+      return await res.json();
+    } catch (err: unknown) {
+      throw parseFetchError(err, 'Unable to retrieve user profile.');
+    }
   }
 };
+

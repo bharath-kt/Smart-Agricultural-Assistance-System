@@ -11,20 +11,36 @@ from sqlalchemy import select
 from app.core.config import settings
 from app.db.base import get_db
 
+import bcrypt
+
+# Workaround for Passlib 1.7.4 compatibility issue with bcrypt 4.0+
+_orig_hashpw = bcrypt.hashpw
+
+def _safe_hashpw(password: bytes, salt: bytes) -> bytes:
+    if len(password) > 72:
+        password = password[:72]
+    return _orig_hashpw(password, salt)
+
+bcrypt.hashpw = _safe_hashpw
+
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login", auto_error=False)
+
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     """Verify a plain password against a hashed password."""
     if not hashed_password or not plain_password:
         return False
-    return pwd_context.verify(plain_password, hashed_password)
+    safe_password = plain_password.encode("utf-8")[:72].decode("utf-8", errors="ignore")
+    return pwd_context.verify(safe_password, hashed_password)
 
 
 def get_password_hash(password: str) -> str:
     """Hash a password securely using bcrypt."""
-    return pwd_context.hash(password)
+    safe_password = password.encode("utf-8")[:72].decode("utf-8", errors="ignore")
+    return pwd_context.hash(safe_password)
+
 
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:

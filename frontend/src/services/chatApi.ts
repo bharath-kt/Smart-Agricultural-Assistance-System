@@ -40,24 +40,35 @@ export async function sendChatMessage(
     conversation_history: history
   };
 
-  const response = await fetch(endpoint, {
-    method: 'POST',
-    headers,
-    body: JSON.stringify(payload)
-  });
+  try {
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(payload)
+    });
 
-  if (!response.ok) {
-    let errorMsg = 'Failed to get response from AI assistant.';
-    try {
-      const errData = await response.json();
-      if (errData.detail) {
-        errorMsg = typeof errData.detail === 'string' ? errData.detail : JSON.stringify(errData.detail);
+    if (!response.ok) {
+      let errorMsg = 'Failed to get response from AI assistant.';
+      try {
+        const errData = await response.json();
+        if (errData.detail) {
+          errorMsg = typeof errData.detail === 'string' ? errData.detail : JSON.stringify(errData.detail);
+        }
+      } catch {
+        // ignore parse error
       }
-    } catch {
-      // ignore parse error
+      throw new Error(errorMsg);
     }
-    throw new Error(errorMsg);
-  }
 
-  return await response.json();
+    return await response.json();
+  } catch (err: unknown) {
+    if (err instanceof TypeError && (err.message.includes('Failed to fetch') || err.message.includes('NetworkError'))) {
+      throw new Error('The AI assistant is temporarily unavailable. Please check your internet connection and try again.');
+    }
+    if (err instanceof Error) {
+      throw err;
+    }
+    throw new Error('Failed to get response from AI assistant.');
+  }
 }
+

@@ -37,3 +37,8 @@ __pycache__/
 .DS_Store
 Thumbs.db
 smart_agri.db
+*.db
+backend/*.db
+backend/.env
+backend/.env.local
+
