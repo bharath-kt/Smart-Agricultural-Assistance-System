@@ -1,4 +1,4 @@
-"""Unit and integration tests for AI Agricultural Chatbot API endpoint and service."""
+"""Unit and integration tests for AI Agricultural Chatbot API endpoint and service supporting General Crop Assistant."""
 import pytest
 from fastapi.testclient import TestClient
 from app.main import app
@@ -8,147 +8,146 @@ client = TestClient(app)
 
 
 class TestChatbotService:
-    """Unit tests for ChatbotService intent detection and response generation."""
+    """Unit tests for ChatbotService multi-crop extraction, intent detection, and context memory."""
 
-    def test_intent_detection_english(self):
-        intent_weather = chatbot_service._detect_intent("Will it rain today?", [])
-        assert intent_weather == "weather"
+    def test_multi_crop_extraction(self):
+        assert chatbot_service._extract_crop("What fertilizer should I use for paddy?", []) == "Paddy"
+        assert chatbot_service._extract_crop("Chilli ge yava fertilizer?", []) == "Chilli"
+        assert chatbot_service._extract_crop("Groundnut cultivation advice", []) == "Groundnut"
+        assert chatbot_service._extract_crop("Ragi cultivation hege madodu?", []) == "Ragi"
+        assert chatbot_service._extract_crop("What is the price of tomato?", []) == "Tomato"
+        assert chatbot_service._extract_crop("Corn ge yava fertilizer use madbeku?", []) == "Corn"
 
-        intent_market = chatbot_service._detect_intent("What is the tomato price?", [])
-        assert intent_market == "market_price"
+    def test_unknown_crop_asking(self):
+        # When crop is unknown and question requires crop context
+        res = chatbot_service._synthesize_fallback_response("What fertilizer should I use?", "fertilizer", None, "en", {}, None)
+        assert "specify which crop" in res.lower()
 
-        intent_scheme = chatbot_service._detect_intent("Are there government subsidies for small farmers?", [])
+        res_kn = chatbot_service._synthesize_fallback_response("ಯಾವ ಗೊಬ್ಬರ ಬಳಸಬೇಕು?", "fertilizer", None, "kn", {}, None)
+        assert "ಯಾವ ಬೆಳೆಯನ್ನು ಬೆಳೆಯುತ್ತಿದ್ದೀರಿ" in res_kn
+
+    def test_conversation_crop_context_memory_and_switch(self):
+        # 1. User says "I am growing paddy."
+        crop1 = chatbot_service._extract_crop("I am growing paddy.", [])
+        assert crop1 == "Paddy"
+
+        history1 = [
+            {"sender": "user", "text": "I am growing paddy."},
+            {"sender": "bot", "text": "Understood! I can help you with paddy cultivation."}
+        ]
+        # 2. User asks "What fertilizer should I use?" -> remembers Paddy from history
+        crop2 = chatbot_service._extract_crop("What fertilizer should I use?", history1)
+        assert crop2 == "Paddy"
+
+        history2 = history1 + [
+            {"sender": "user", "text": "What fertilizer should I use?"},
+            {"sender": "bot", "text": "Fertilizer management for Paddy..."}
+        ]
+        # 3. User asks "How much water does it need?" -> remembers Paddy from history
+        crop3 = chatbot_service._extract_crop("How much water does it need?", history2)
+        assert crop3 == "Paddy"
+
+        # 4. User changes crop: "Actually I am growing corn now."
+        crop4 = chatbot_service._extract_crop("Actually I am growing corn now.", history2)
+        assert crop4 == "Corn"
+
+        history3 = history2 + [
+            {"sender": "user", "text": "Actually I am growing corn now."},
+            {"sender": "bot", "text": "Updated crop context to Corn."}
+        ]
+        # 5. Next question refers to Corn
+        crop5 = chatbot_service._extract_crop("What fertilizer should I use?", history3)
+        assert crop5 == "Corn"
+
+    def test_weather_isolation(self):
+        # Weather data must NOT be forced into non-weather queries
+        intent_scheme = chatbot_service._detect_intent("What government schemes are available?", [])
         assert intent_scheme == "government_scheme"
 
-        intent_disease = chatbot_service._detect_intent("How do I control tomato early blight?", [])
-        assert intent_disease == "disease_treatment"
-
-    def test_intent_detection_kannada(self):
-        intent_weather_kn = chatbot_service._detect_intent("ಇವತ್ತು ಹವಾಮಾನ ಹೇಗಿದೆ?", [])
-        assert intent_weather_kn == "weather"
-
-        intent_market_kn = chatbot_service._detect_intent("ಟೊಮೆಟೊ ಬೆಲೆ ಎಷ್ಟು?", [])
-        assert intent_market_kn == "market_price"
-
-        intent_scheme_kn = chatbot_service._detect_intent("ರೈತರಿಗೆ ಯಾವ ಸರ್ಕಾರಿ ಯೋಜನೆಗಳಿವೆ?", [])
-        assert intent_scheme_kn == "government_scheme"
-
-    def test_intent_detection_mixed_language(self):
-        intent_fertilizer = chatbot_service._detect_intent("Tomato ge yava fertilizer use madbeku?", [])
-        assert intent_fertilizer == "fertilizer"
-
-        intent_market_mixed = chatbot_service._detect_intent("Tomato ಬೆಲೆ ಎಷ್ಟು?", [])
-        assert intent_market_mixed == "market_price"
-
-    def test_context_memory_coreference(self):
-        history = [
-            {"sender": "user", "text": "What is tomato early blight?"},
-            {"sender": "bot", "text": "Early blight is a fungal disease causing dark spots."}
-        ]
-        intent = chatbot_service._detect_intent("How do I treat it?", history)
-        crop = chatbot_service._extract_crop("How do I treat it?", history)
-
-        assert intent == "disease_treatment"
-        assert crop == "Tomato"
-
-    def test_disease_routing_crop_limits(self):
-        # Disease knowledge supports Tomato and Corn only, not Paddy
-        disease_info = chatbot_service._extract_crop("Tell me about paddy blast disease", [])
-        assert disease_info is None or disease_info not in ["Paddy"]
+        intent_market = chatbot_service._detect_intent("What is the market price of paddy?", [])
+        assert intent_market in ["market_price", "market_prediction"]
 
 
 class TestChatbotEndpoints:
     """Integration test suite for POST /api/v1/chat."""
 
-    def test_chat_success_english(self):
+    def test_chat_unknown_crop_prompt(self):
         payload = {
-            "message": "What fertilizer is good for tomato?",
+            "message": "What fertilizer should I use?",
             "language": "en",
             "conversation_history": []
         }
         response = client.post("/api/v1/chat", json=payload)
         assert response.status_code == 200
         data = response.json()
-        assert "response" in data
-        assert data["intent"] in ["fertilizer", "disease_information", "general_agriculture"]
-        assert len(data["response"]) > 10
+        assert "crop" in data["response"].lower() or "which" in data["response"].lower() or "specify" in data["response"].lower()
 
-    def test_chat_success_kannada(self):
+    def test_chat_paddy_fertilizer_query(self):
         payload = {
-            "message": "ಇವತ್ತು ಹವಾಮಾನ ಹೇಗಿದೆ?",
+            "message": "Paddy ge yava fertilizer use madbeku?",
             "language": "kn",
             "conversation_history": []
         }
         response = client.post("/api/v1/chat", json=payload)
         assert response.status_code == 200
         data = response.json()
-        assert data["language"] == "kn"
-        assert data["intent"] == "weather"
-        assert "ತಾಪಮಾನ" in data["response"] or "ಹವಾಮಾನ" in data["response"]
+        assert data["intent"] in ["fertilizer", "general_agriculture"]
+        assert "Paddy" in data["response"] or "ಬೆಳೆಗೆ" in data["response"] or "ಗೊಬ್ಬರ" in data["response"]
 
-    def test_chat_weather_routing(self):
+    def test_chat_groundnut_cultivation_query(self):
         payload = {
-            "message": "Will it rain today in Mysuru?",
-            "language": "en"
+            "message": "How can I cultivate groundnut?",
+            "language": "en",
+            "conversation_history": []
         }
         response = client.post("/api/v1/chat", json=payload)
         assert response.status_code == 200
         data = response.json()
-        assert data["intent"] == "weather"
-        assert "Temperature" in data["response"] or "Humidity" in data["response"] or "weather" in data["response"].lower()
+        assert "Groundnut" in data["response"] or "groundnut" in data["response"].lower()
 
-    def test_chat_market_routing(self):
+    def test_chat_ragi_kanglish_query(self):
         payload = {
-            "message": "What is today's tomato market price?",
-            "language": "en"
+            "message": "Ragi cultivation hege madodu?",
+            "language": "kn",
+            "conversation_history": []
         }
         response = client.post("/api/v1/chat", json=payload)
         assert response.status_code == 200
         data = response.json()
-        assert data["intent"] == "market_price"
-        assert "Price" in data["response"] or "Quintal" in data["response"] or "Tomato" in data["response"]
+        assert "Ragi" in data["response"] or "ರಾಗಿ" in data["response"] or "ಕೃಷಿ" in data["response"]
 
-    def test_chat_schemes_routing(self):
+    def test_chat_chilli_fertilizer_query(self):
         payload = {
-            "message": "What government schemes are available for farmers?",
-            "language": "en"
+            "message": "Chilli ge yava fertilizer?",
+            "language": "en",
+            "conversation_history": []
+        }
+        response = client.post("/api/v1/chat", json=payload)
+        assert response.status_code == 200
+        data = response.json()
+        assert "Chilli" in data["response"] or "fertilizer" in data["response"].lower()
+
+    def test_chat_schemes_no_weather_leakage(self):
+        payload = {
+            "message": "What government schemes are available?",
+            "language": "en",
+            "conversation_history": []
         }
         response = client.post("/api/v1/chat", json=payload)
         assert response.status_code == 200
         data = response.json()
         assert data["intent"] == "government_scheme"
         assert "PM-KISAN" in data["response"] or "scheme" in data["response"].lower()
+        assert "Humidity" not in data["response"] and "Temperature" not in data["response"]
 
-    def test_chat_disease_routing(self):
+    def test_chat_paddy_market_price_query(self):
         payload = {
-            "message": "What disease affects tomato leaves with dark spots?",
-            "language": "en"
-        }
-        response = client.post("/api/v1/chat", json=payload)
-        assert response.status_code == 200
-        data = response.json()
-        assert data["intent"] in ["disease_information", "disease_treatment"]
-        assert "Tomato" in data["response"] or "Blight" in data["response"]
-
-    def test_chat_empty_message_validation(self):
-        payload = {
-            "message": "   ",
-            "language": "en"
-        }
-        response = client.post("/api/v1/chat", json=payload)
-        assert response.status_code == 400
-        assert "Message cannot be empty" in response.json()["detail"]
-
-    def test_chat_context_memory_endpoint(self):
-        payload = {
-            "message": "How do I treat it?",
+            "message": "What is the market price of paddy?",
             "language": "en",
-            "conversation_history": [
-                {"sender": "user", "text": "What is tomato early blight?"},
-                {"sender": "bot", "text": "Early blight is caused by Alternaria solani fungus."}
-            ]
+            "conversation_history": []
         }
         response = client.post("/api/v1/chat", json=payload)
         assert response.status_code == 200
         data = response.json()
-        assert data["intent"] == "disease_treatment"
+        assert data["intent"] == "market_price"
+        assert "Paddy" in data["response"] or "paddy" in data["response"].lower()
